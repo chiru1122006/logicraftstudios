@@ -319,11 +319,11 @@ export class Esp32Bridge {
     }
 
     const base = API_BASE();
-    const wsProtocol = base.startsWith('https') ? 'wss:' : 'ws:';
     const sessionId = getTabSessionId();
-    const wsUrl =
-      base.replace(/^https?:/, wsProtocol) +
-      `/simulation/ws/${encodeURIComponent(sessionId + '::' + this.boardId)}`;
+    const path = `/simulation/ws/${encodeURIComponent(sessionId + '::' + this.boardId)}`;
+    const wsUrl = (base.startsWith('http://') || base.startsWith('https://'))
+      ? base.replace(/^https?:/, base.startsWith('https') ? 'wss:' : 'ws:') + path
+      : `ws://104.214.172.50/api${path}`;
 
     const socket = new WebSocket(wsUrl);
     this.socket = socket;
