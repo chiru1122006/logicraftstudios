@@ -132,8 +132,6 @@ export class Stm32Bridge {
     } else if (base.startsWith('http://') || base.startsWith('https://')) {
       const wsProtocol = base.startsWith('https') ? 'wss:' : 'ws:';
       wsUrl = base.replace(/^https?:/, wsProtocol) + path;
-    } else if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
-      wsUrl = `wss://api.logicraftstudios.tech/api${path}`;
     } else {
       wsUrl = `ws://104.214.172.50/api${path}`;
     }
