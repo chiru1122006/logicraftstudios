@@ -126,9 +126,17 @@ export class Stm32Bridge {
     const base = API_BASE();
     const sessionId = getTabSessionId();
     const path = `/simulation/ws/${encodeURIComponent(sessionId + '::' + this.boardId)}`;
-    const wsUrl = (base.startsWith('http://') || base.startsWith('https://'))
-      ? base.replace(/^https?:/, base.startsWith('https') ? 'wss:' : 'ws:') + path
-      : `ws://104.214.172.50/api${path}`;
+    let wsUrl: string;
+    if (import.meta.env.VITE_WS_BASE) {
+      wsUrl = (import.meta.env.VITE_WS_BASE as string).replace(/\/+$/, '') + path;
+    } else if (base.startsWith('http://') || base.startsWith('https://')) {
+      const wsProtocol = base.startsWith('https') ? 'wss:' : 'ws:';
+      wsUrl = base.replace(/^https?:/, wsProtocol) + path;
+    } else if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+      wsUrl = `wss://api.logicraftstudios.tech/api${path}`;
+    } else {
+      wsUrl = `ws://104.214.172.50/api${path}`;
+    }
 
     const socket = new WebSocket(wsUrl);
     this.socket = socket;
