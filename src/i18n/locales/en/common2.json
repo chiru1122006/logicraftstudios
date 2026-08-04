@@ -1,0 +1,436 @@
+{
+  "editor": {
+    "toolbar": {
+      "languageMode": "Language mode",
+      "compile": {
+        "addBoard": "Add a board to compile",
+        "loading": "Loading…",
+        "loadMicropython": "Load MicroPython",
+        "compile": "Compile (Ctrl+B)"
+      },
+      "run": {
+        "addBoard": "Add a board to run",
+        "runMicropython": "Run MicroPython",
+        "run": "Run (auto-compiles if needed)",
+        "runActiveOnly": "Run only {{name}}",
+        "options": "Run options"
+      },
+      "stop": "Stop",
+      "reset": "Reset",
+      "compileAll": "Compile all boards",
+      "runAll": "Run all boards",
+      "libraries": {
+        "title": "Search and install Arduino libraries",
+        "label": "Libraries"
+      },
+      "import": "Import project (.vlx Logicraft Studio or .zip Wokwi)",
+      "export": "Export the current project as a .zip file",
+      "uploadFirmware": "Upload firmware (.hex, .bin, .elf, .ihex) to bypass compilation",
+      "toggleConsole": "Toggle Output Console",
+      "libHint": {
+        "message": "Missing library? Install it from the",
+        "cta": "Library Manager",
+        "dismiss": "Dismiss"
+      },
+      "exportBom": "Export Bill of Materials (CSV — Pro)",
+      "exportScreenshot": "Export schematic as image (PNG — Pro)"
+    },
+    "fileExplorer": {
+      "workspace": "WORKSPACE",
+      "newWorkspace": "New workspace (clears boards, components, wires and files)",
+      "confirmNew": {
+        "title": "Start a new workspace?",
+        "message": "This clears every board, component, wire and file. This cannot be undone.",
+        "confirm": "Start new",
+        "cancel": "Cancel"
+      },
+      "confirmLoad": {
+        "title": "Load project?",
+        "message": "Load this {{type}} project? Your current workspace will be replaced. This cannot be undone.",
+        "confirm": "Load"
+      },
+      "saveProject": "Save project (Ctrl+S)",
+      "clickToEdit": "click to edit",
+      "collapse": "Collapse",
+      "expand": "Expand",
+      "newFileInBoard": "New file in this board",
+      "unsavedChanges": "Unsaved changes",
+      "unsavedSuffix": "unsaved",
+      "emptyState": "Add a board to the canvas to start editing code.",
+      "confirmDelete": "Delete this file?",
+      "status": {
+        "running": "Running",
+        "compiled": "Compiled",
+        "idle": "Idle"
+      },
+      "contextMenu": {
+        "rename": "Rename",
+        "delete": "Delete"
+      }
+    },
+    "fileTabs": {
+      "unsavedChanges": "Unsaved changes",
+      "close": "Close",
+      "confirmClose": "Close file with unsaved changes?",
+      "closeAnyway": "Close anyway",
+      "cancel": "Cancel"
+    },
+    "loginPrompt": {
+      "title": "Sign in to save your project",
+      "body": "Create a free account to save and share your projects.",
+      "createAccount": "Create account",
+      "cancel": "Cancel"
+    },
+    "saveProject": {
+      "titleSave": "Save project",
+      "titleUpdate": "Update project",
+      "nameLabel": "Project name *",
+      "namePlaceholder": "My awesome project",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Optional",
+      "save": "Save",
+      "update": "Update",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "visibility": {
+        "public": "Public",
+        "publicHint": "Anyone with the link can view",
+        "private": "Private",
+        "privateHint": "Only you can see this"
+      },
+      "errors": {
+        "nameRequired": "Project name is required.",
+        "unreachable": "Server unreachable. Check your connection and try again.",
+        "notAuth": "Not authenticated. Please log in and try again.",
+        "failedStatus": "Save failed ({{status}})."
+      }
+    },
+    "share": {
+      "title": "Share project",
+      "public": "Public",
+      "private": "Private",
+      "publicHint": "Anyone with the link can view this project",
+      "privateHint": "Only you can see this project",
+      "makePrivate": "Make private",
+      "makePublic": "Make public",
+      "copy": "Copy",
+      "privateWarning": "This project is private. Others will see a 403 error when opening this link.",
+      "close": "Close"
+    },
+    "canvas": {
+      "status": {
+        "running": "Running",
+        "stopped": "Stopped"
+      },
+      "activeBoard": "Active board",
+      "noBoard": "No board",
+      "noBoardHint": "No board on canvas — add one with the Add button to compile and run code",
+      "undo": {
+        "label": "Undo",
+        "title": "Undo: {{description}} (Ctrl+Z)",
+        "empty": "Nothing to undo"
+      },
+      "redo": {
+        "label": "Redo",
+        "title": "Redo: {{description}} (Ctrl+Y)",
+        "empty": "Nothing to redo"
+      },
+      "toggleSerialMonitor": "Toggle Serial Monitor",
+      "serial": "Serial",
+      "toggleScope": "Toggle Oscilloscope / Logic Analyzer",
+      "scope": "Scope",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "resetView": "Reset view (click to reset)",
+      "componentCount_one": "{{count}} component",
+      "componentCount_other": "{{count}} components",
+      "addComponentTitle": "Add Component",
+      "add": "Add",
+      "dismiss": "Dismiss",
+      "removeBoard": "Remove board",
+      "wireCount_one": "{{count}} wire",
+      "wireCount_other": "{{count}} wires",
+      "removeConfirm": {
+        "boardFallback": "Board",
+        "title": "Remove {{label}}?",
+        "body": "This will remove the board from the workspace. This action cannot be undone.",
+        "bodyWithWires_one": "This will remove the board from the workspace and {{count}} connected wire. This action cannot be undone.",
+        "bodyWithWires_other": "This will remove the board from the workspace and {{count}} connected wires. This action cannot be undone.",
+        "cancel": "Cancel",
+        "remove": "Remove"
+      }
+    },
+    "componentPicker": {
+      "title": "Add Component",
+      "close": "Close",
+      "searchPlaceholder": "Search components...",
+      "clearSearch": "Clear search",
+      "allComponents": "All Components",
+      "boards": "Boards",
+      "loading": "Loading components...",
+      "noResults": "No components found",
+      "clearFilters": "Clear filters"
+    },
+    "libraryManager": {
+      "title": "LIBRARY MANAGER",
+      "searchTab": "Search",
+      "installedTab": "Installed",
+      "filterPlaceholder": "Filter your search...",
+      "searchingFor": "Searching \"{{query}}\"…",
+      "loadingLibraries": "Loading libraries…",
+      "noResults": "No libraries available",
+      "noResultsFor": "No libraries found for \"{{query}}\"",
+      "byAuthor": "by {{author}}",
+      "install": "INSTALL",
+      "installing": "Installing...",
+      "uninstall": "UNINSTALL",
+      "uninstalling": "Uninstalling...",
+      "loadingInstalled": "Loading installed libraries...",
+      "noneInstalled": "No libraries installed yet.",
+      "useSearchTab": "Use the Search tab to install libraries."
+    },
+    "installLibs": {
+      "title": "REQUIRED LIBRARIES",
+      "installingProgress": "Installing {{done}} of {{total}}…",
+      "allDone": "All libraries installed successfully",
+      "required_one": "This project requires {{count}} library. Install it to compile correctly.",
+      "required_other": "This project requires {{count}} libraries. Install them to compile correctly.",
+      "wokwiHosted": "Wokwi-hosted library",
+      "pending": "pending",
+      "installing": "installing…",
+      "installed": "installed",
+      "errorStatus": "error",
+      "close": "Close",
+      "skip": "Skip",
+      "installAll": "Install All ({{count}})",
+      "installingShort": "Installing…"
+    },
+    "shell": {
+      "code": "Code",
+      "both": "Both",
+      "circuit": "Circuit",
+      "showExplorer": "Show file explorer",
+      "hideExplorer": "Hide file explorer",
+      "viewMode": "View mode",
+      "dragResize": "Drag to resize"
+    },
+    "oscilloscope": {
+      "title": "Oscilloscope",
+      "addChannelTitle": "Add a pin channel",
+      "addChannel": "Add Channel",
+      "timeDiv": "Time/div:",
+      "pauseTitle": "Pause capture",
+      "resumeTitle": "Resume capture",
+      "pause": "Pause",
+      "run": "Run",
+      "clearTitle": "Clear all captured samples",
+      "clear": "Clear",
+      "noChannels": "No channels added.",
+      "noChannelsHint": "Click \"+ Add Channel\" to monitor a pin.",
+      "removeChannel": "Remove {{label}}"
+    },
+    "componentProps": {
+      "close": "Close",
+      "tapToConnect": "Tap a pin to connect:",
+      "tapToWire": "Tap a pin to wire:",
+      "pinRoles": "Pin Roles:",
+      "arduinoPin": "Arduino Pin:",
+      "confirmDelete": "Delete {{name}}?",
+      "confirmDeleteTitle": "Confirm delete",
+      "deleteTitle": "Delete component",
+      "rotate90": "Rotate 90°",
+      "rotate": "Rotate",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "keyboardKey": "Keyboard key",
+      "assignKey": "Assign key",
+      "pressAKey": "Press a key…",
+      "clearKey": "Remove key binding",
+      "keyInUse": "Also assigned to another button — both will press together."
+    },
+    "selectionBar": {
+      "label": "Selection actions",
+      "rotate90": "Rotate 90°",
+      "rotate": "Rotate",
+      "delete": "Delete",
+      "deselect": "Deselect",
+      "changeColor": "Change color",
+      "deleteKind": {
+        "wire": "Delete wire",
+        "component": "Delete component",
+        "board": "Delete board"
+      }
+    },
+    "console": {
+      "title": "Output",
+      "errorCount_one": "{{count}} error",
+      "errorCount_other": "{{count}} errors",
+      "warningCount_one": "{{count}} warning",
+      "warningCount_other": "{{count}} warnings",
+      "filterAll": "All",
+      "filterErrors": "Errors",
+      "filterWarnings": "Warnings",
+      "auto": "Auto",
+      "clear": "Clear output",
+      "close": "Close",
+      "empty": "No compilation output yet. Click Compile to start."
+    },
+    "boardPicker": {
+      "title": "Add Board"
+    },
+    "pinPicker": {
+      "close": "Close",
+      "filterPins": "Filter pins…",
+      "noMatch": "No pins match.",
+      "rotate": "Rotate",
+      "delete": "Delete"
+    },
+    "boardOptions": {
+      "confirmOverwrite": {
+        "title": "Overwrite file?",
+        "message": "A file named \"{{name}}\" already exists. Overwrite?",
+        "confirm": "Overwrite",
+        "cancel": "Skip"
+      }
+    },
+    "pi": {
+      "connected": "Connected",
+      "starting": "Starting…",
+      "bootingTitle": "Booting {{board}}…",
+      "bootingNote": "Starting Linux — this can take up to a minute the first time.",
+      "offline": "Offline",
+      "powerOnTitle": "Power on the Raspberry Pi",
+      "startPi": "Start Pi",
+      "connectTitle": "Connect terminal to Pi",
+      "connect": "Connect",
+      "disconnectTitle": "Disconnect terminal",
+      "disconnect": "Disconnect",
+      "terminal": "Terminal",
+      "close": "Close",
+      "offlineTitle": "{{board}} is powered off",
+      "offlineSubtitle": "Start the Pi to open a terminal and interact with the Linux system.",
+      "offlineNote1": "Note: The file explorer shows a staging area.",
+      "offlineNote2": "\"Upload to Pi\" sends these files to the running system, starting the Pi automatically if needed.",
+      "loadingTerminal": "Loading terminal…",
+      "confirmDelete": {
+        "title": "Delete",
+        "message": "Delete \"{{name}}\"?",
+        "confirm": "Delete",
+        "cancel": "Cancel"
+      },
+      "selectFile": "Select a file from the explorer to edit it."
+    },
+    "sensorPanel": {
+      "close": "Close"
+    },
+    "customChip": {
+      "title": "Custom Chip — {{chipName}}",
+      "tabExamples": "Examples",
+      "tabEditor": "Editor",
+      "attributes": "Attributes",
+      "compiling": "Compiling…",
+      "compile": "Compile",
+      "compiledOk": "✓ Compiled — {{kb}} KB",
+      "compileFailed": "Compile failed",
+      "cancel": "Cancel",
+      "savePlace": "Save & Place",
+      "compileFirst": "Compile first"
+    },
+    "serial": {
+      "title": "Serial Monitor",
+      "addBoard": "Add a board to start the serial monitor.",
+      "autoscroll": "Autoscroll",
+      "clearTitle": "Clear output for this board",
+      "clear": "Clear",
+      "send": "Send",
+      "iotGatewayTitle": "Click to open through IoT Gateway",
+      "openIotGateway": "Open IoT Gateway",
+      "waitingData": "Waiting for serial data...",
+      "startSim": "Start simulation to see serial output.",
+      "placeholderText": "Type message to send...",
+      "placeholderPython": "Type Python expression... (Ctrl+C to interrupt)",
+      "lineEnd": {
+        "none": "No line ending",
+        "nl": "Newline",
+        "cr": "Carriage return",
+        "both": "Both NL & CR"
+      }
+    }
+  },
+  "about": {
+    "hero": {
+      "title": "About Logicraft Studio",
+      "subtitle": "A free, open-source embedded systems and SPICE circuit simulator — built by me, Chirudeep Reddy, ECE Student at Amrita Vishwa Vidyapeetham, Bengaluru."
+    },
+    "story": {
+      "heading": "My Story & Motivation",
+      "p1": "I am Chirudeep Reddy (Roll No: BL.EN.U4ECE24164), an Electronics and Communication Engineering (ECE) student at Amrita Vishwa Vidyapeetham (Amrita University), Bengaluru.",
+      "p2": "As an ECE student working on microcontrollers and circuit design, I experienced firsthand how difficult it can be to access physical hardware, test components late at night, or debug complex breadboard circuits with damaged ICs and loose wiring.",
+      "p3": "Driven by my passion for hardware engineering, microcontrollers, and software development, I set out to build a tool that bridges the gap between electronics education and browser technology — allowing students and makers to simulate Arduino, ESP32, Raspberry Pi, and SPICE circuits without needing physical hardware upfront.",
+      "p4": "I built <strong>Logicraft Studio</strong> to combine real CPU emulation (AVR8, Xtensa, RISC-V, ARM) with real-time SPICE analog circuit analysis and live test instruments, giving students a zero-friction playground to write firmware, wire components, and analyze signals instantly.",
+      "p5": "Today, I have made Logicraft Studio 100% open-source (AGPLv3) and freely available to students, educators, and embedded enthusiasts around the world."
+    },
+    "howItWorks": {
+      "heading": "How It Works",
+      "avrRp2040Body": "Cycle-accurate emulation runs entirely in your browser using avr8js and rp2040js. No backend needed for simulation.",
+      "esp32Body": "Xtensa ESP32 and ESP32-S3 run on backend QEMU (lcgamboa fork) with real flash images, GPIO, ADC, and timers.",
+      "riscvBody": "ESP32-C3 (DevKit, XIAO, SuperMini) and CH32V003 are emulated through the QEMU lcgamboa fork with libqemu-riscv32, the same backend pattern as Xtensa ESP32.",
+      "raspiBody": "Full ARM Cortex-A53 Linux via QEMU raspi3b — boots real Raspberry Pi OS and runs Python with RPi.GPIO."
+    },
+    "openSource": {
+      "heading": "Open Source Philosophy",
+      "lead": "Logicraft Studio is <strong>100% open source</strong> under the AGPLv3 license. No cloud dependency, no student accounts, no data leaving your network. Universities and bootcamps can deploy it on their own servers with a single Docker command and give every student access to a complete embedded development environment — for free.",
+      "creditsIntro": "The project builds on top of amazing open-source work from the community:",
+      "credits": {
+        "avr8js": "AVR8 CPU emulation by Wokwi",
+        "rp2040js": "RP2040 emulation by Wokwi",
+        "wokwiElements": "48+ visual electronic components by Wokwi",
+        "qemuLcgamboa": "ESP32 and Raspberry Pi QEMU emulation",
+        "arduinoCli": "Arduino compilation toolchain"
+      },
+      "inspiredBy": "Logicraft Studio was inspired by <a>Wokwi</a>, which is a fantastic tool. My goal with Logicraft Studio is to take a different path: fully open source, self-hostable, and supporting multiple heterogeneous boards in the same circuit."
+    },
+    "creator": {
+      "heading": "About Me",
+      "role": "ECE Student @ Amrita Vishwa Vidyapeetham, Bengaluru",
+      "bio1": "I am Chirudeep Reddy (Roll No: BL.EN.U4ECE24164), an undergraduate student in the Department of Electronics and Communication Engineering (ECE) at Amrita Vishwa Vidyapeetham, Bengaluru.",
+      "bio2": "I am passionate about embedded systems, VLSI, microcontrollers, signal processing, and full-stack software development. I love building developer tools that make electronics education accessible to everyone.",
+      "bio3": "I designed and built Logicraft Studio — an open-source multi-board embedded systems and SPICE circuit simulator for students, makers, and engineers.",
+      "techStack": "My Tech Stack"
+    },
+    "releases": {
+      "heading": "Recent releases",
+      "latest": "Latest",
+      "v3Tagline": "Retro CPUs, multi-board systems, full-circuit accuracy",
+      "v3Blurb": "Programmable Z80/8080/4004 retro CPUs with custom ROM, MicroSD and ePaper emulation, true multi-board UART/I2C/SPI interconnect, ESP32-CAM, full undo/redo, the complete ngspice WASM migration, an 88% smaller bundle, and 100+ new examples.",
+      "v25Tagline": "Arduino meets SPICE in your browser",
+      "v25Blurb": "Real-time analog circuit simulation via ngspice-WASM, wired to Arduino, ESP32 and Raspberry Pi Pico. 100+ SPICE-accurate components, live ammeters and voltmeters, 40 new analog/hybrid examples — co-simulated with your firmware.",
+      "v2Tagline": "Multi-board canvas, ESP32, Raspberry Pi 3",
+      "v2Blurb": "Full QEMU-driven ESP32 emulation with WiFi/BLE, Raspberry Pi 3B Linux, MicroPython support across Pico/ESP32, custom WASM chips, and a redesigned canvas with multi-board co-simulation.",
+      "readNotes": "Read the launch notes →"
+    },
+    "quote": {
+      "p1": "\"As an ECE student, I realized that our best ideas shouldn't be blocked by missing hardware or damaged laboratory components.\"",
+      "p2": "\"I built Logicraft Studio to give every student a <strong>complete, SPICE-accurate electronics lab directly in their browser tab</strong>.\"",
+      "p3": "\"Simulate, innovate, and build without boundaries.\""
+    },
+    "community": {
+      "heading": "Community & Press",
+      "stats": {
+        "githubStars": "GitHub Stars",
+        "countries": "Countries",
+        "supportedBoards": "Supported Boards",
+        "cpuArchitectures": "CPU Architectures"
+      },
+      "featuredOn": "Featured on:",
+      "press": {
+        "hackerNews": "Hacker News (Front Page)"
+      }
+    },
+    "cta": {
+      "title": "Ready to try Logicraft Studio?",
+      "subtitle": "No signup required. Runs 100% in your browser. Free and open source.",
+      "openEditor": "Open Editor"
+    }
+  }
+}

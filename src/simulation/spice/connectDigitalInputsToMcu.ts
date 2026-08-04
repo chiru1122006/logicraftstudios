@@ -1,0 +1,104 @@
+/**
+ * connectDigitalInputsToMcu — drive ESP32 digital input pins from the
+ * solved circuit, so `digitalRead()` reflects the REAL wiring.
+ *
+ * The ESP32 runs in backend QEMU; its GPIO input register is fed only by
+ * whatever the host injects via `esp32_gpio_in`. Historically a button was
+ * faked by the part layer (BasicParts seeds the pin HIGH and toggles it on
+ * press) — which ignores the actual circuit, so a mis-wired button still
+ * "worked". This connector replaces that for ESP32: after every SPICE solve
+ * it thresholds each input pin's net voltage and pushes the logic level into
+ * QEMU. Now the internal pull-up (modelled as a netlist resistor), the button
+ * switch, the GND connection and any short are all honoured — a button wired
+ * to the wrong terminal reads stuck-LOW, exactly like real silicon.
+ *
+ * Mirrors `connectAnalogInputsToMcu` (ADC path) and `connectChipInputsToSolve`
+ * (custom-chip path): it knows ONLY the electrical store shape.
+ *
+ * Only pins the MCU is NOT actively driving as outputs are injected, so we
+ * never fight a `digitalWrite`. Other boards (AVR / RP2040) keep the legacy
+ * part-seed path; only the ESP32 QEMU bridge opts in (`spiceDrivenInputs`).
+ */
+import { useSimulatorStore, getBoardSimulator, getBoardPinManager } from '../../store/useSimulatorStore';
+import { useElectricalStore } from '../../store/useElectricalStore';
+import { isStm32BoardKind } from '../../types/board';
+import { stm32PinNameToLinear } from '../Stm32Bridge';
+
+// 3.3 V LVCMOS thresholds with a hysteresis band so a node hovering near the
+// midpoint doesn't chatter. A pulled-up idle input sits at ~3.3 V and a
+// pressed button pulls it to ~0 V, so the band is rarely entered.
+const V_HIGH = 2.0;
+const V_LOW = 0.8;
+
+/** Map a board pin name to a plain GPIO number, or -1 if it isn't one we
+ *  drive digitally (GND/VCC/UART-named pads, etc.). */
+function gpioFromPinName(name: string): number {
+  if (/^\d+$/.test(name)) return parseInt(name, 10); // "4", "15"
+  const m = name.match(/^GPIO(\d+)$/i) || name.match(/^GP(\d+)$/i);
+  return m ? parseInt(m[1], 10) : -1;
+}
+
+export function connectDigitalInputsToMcu(): () => void {
+  // Last logic level pushed per `${boardId}:${gpio}`, so we only emit edges
+  // and the hysteresis band can hold the previous level. This connector is
+  // the sole writer of ESP32 input pins, so the cache tracks QEMU's state.
+  const lastLevel = new Map<string, boolean>();
+
+  function injectDigitalInputs() {
+    const { nodeVoltages, pinNetMap, sourcedNets } = useElectricalStore.getState();
+    const { boards } = useSimulatorStore.getState();
+    for (const board of boards) {
+      const sim = getBoardSimulator(board.id) as
+        | { setPinState?: (pin: number, state: boolean) => void; spiceDrivenInputs?: boolean }
+        | null;
+      if (!sim?.spiceDrivenInputs || typeof sim.setPinState !== 'function') continue;
+      const pm = getBoardPinManager(board.id);
+      const driven = pm ? pm.getOutputPins() : new Set<number>();
+      const prefix = `${board.id}:`;
+      // STM32 names pins PA0/PC13/… and its PinManager + setPinState key on the
+      // linear pin (port*16+pin); every other board uses plain GPIO numbers.
+      const isStm32 = isStm32BoardKind(board.boardKind);
+      for (const [key, net] of pinNetMap) {
+        if (!key.startsWith(prefix)) continue;
+        const pinName = key.slice(prefix.length);
+        const gpio = isStm32 ? stm32PinNameToLinear(pinName) : gpioFromPinName(pinName);
+        if (gpio < 0) continue;
+        if (driven.has(gpio)) continue; // the MCU drives this pin (digitalWrite)
+        // Only drive pins whose net is backed by a real source/element (rail,
+        // pull, button switch, divider, cross-board output, …). A net that is
+        // only floating (an event-driven part like a rotary encoder / keypad
+        // that has no SPICE model) is left to the part layer, which seeds the
+        // pin directly — otherwise its ~0 V floating read would force it LOW
+        // and fight the part. This is what makes it safe to enable
+        // spiceDrivenInputs on the AVR (which has many such part-driven pins).
+        if (!sourcedNets.has(net)) continue;
+        const v = nodeVoltages[net];
+        if (v == null) continue;
+        const stateKey = `${board.id}:${gpio}`;
+        const prev = lastLevel.get(stateKey);
+        let next: boolean;
+        if (v >= V_HIGH) next = true;
+        else if (v <= V_LOW) next = false;
+        else next = prev ?? false; // inside the hysteresis band — hold
+        if (prev === next) continue;
+        lastLevel.set(stateKey, next);
+        sim.setPinState(gpio, next);
+      }
+    }
+  }
+
+  const unsubResult = useElectricalStore.subscribe((state, prev) => {
+    if (state.nodeVoltages !== prev.nodeVoltages) injectDigitalInputs();
+  });
+  // Reset the cache when boards change (Run / Reset spawns a fresh QEMU whose
+  // GPIO inputs default LOW, so we must re-emit even unchanged levels).
+  const unsubBoards = useSimulatorStore.subscribe((state, prev) => {
+    if (state.boards !== prev.boards) lastLevel.clear();
+  });
+  // Initial pass for examples that pre-populate the store before mount.
+  injectDigitalInputs();
+  return () => {
+    unsubResult();
+    unsubBoards();
+  };
+}

@@ -1,0 +1,165 @@
+{
+  "v2": {
+    "versionBadge": "Version 2.0",
+    "heroAccent": "Simulateur embarqué multi-plateforme",
+    "heroSubtitle": "Simulez Arduino, ESP32, Raspberry Pi Pico et Raspberry Pi 3 dans votre navigateur. 19 cartes, 68+ exemples prêts à l'emploi, simulation réaliste de capteurs. Gratuit, open-source, sans installation.",
+    "tryV2": "Essayer Logicraft Studio 2.0",
+    "joinDiscord": "Rejoindre Discord",
+    "boardsHeading": "19 cartes. 5 architectures. Un seul outil.",
+    "boardsLead": "Du 8-bit AVR au quad-core ARM Linux — Logicraft Studio 2.0 émule chaque plateforme embarquée majeure dans un seul onglet de navigateur.",
+    "multipleBoards": "Plusieurs cartes dans un seul circuit",
+    "mixArchitectures": "Mélanger les architectures",
+    "mixArchitecturesBody": "Connectez un ESP32 à un Raspberry Pi 3, câblez trois Arduinos ensemble, ou combinez un Pico avec un ESP32-C3. N'importe quelle combinaison fonctionne.",
+    "realInterBoard": "Vraie communication inter-cartes",
+    "realInterBoardBody": "Les cartes communiquent via des connexions filaires — UART, I2C, SPI ou simples signaux GPIO, comme du vrai matériel.",
+    "uniqueFeature": "Aucun autre simulateur ne fait cela",
+    "uniqueFeatureBody": "Les simulateurs traditionnels émulent une carte isolée. Logicraft Studio simule des systèmes entiers avec plusieurs cartes fonctionnant simultanément.",
+    "whatsNew": "Nouveautés de la version 2.0",
+    "whatsNewLead": "Une transformation complète en simulateur de systèmes embarqués multi-plateforme — plus de cartes, une émulation plus précise, une meilleure expérience développeur.",
+    "examplesHeading": "68+ exemples prêts à l'emploi",
+    "examplesLead": "Du clignotement de LED basique à la communication multi-cartes — des exemples pour chaque plateforme et niveau de compétence.",
+    "examples": {
+      "arduino": {
+        "title": "Arduino (17 exemples)",
+        "body": "Blink, feu de circulation, bouton, fondu, LED RGB, jeu Simon Says, écran TFT, LCD, scanner I2C, boucle SPI, et plus."
+      },
+      "pico": {
+        "title": "Raspberry Pi Pico (18 exemples)",
+        "body": "Blink, série, I2C (scanner, RTC, EEPROM), SPI, lecture ADC, DHT22, HC-SR04, servo, joystick, capteur NTC."
+      },
+      "esp32": {
+        "title": "ESP32 (9 exemples)",
+        "body": "Blink, écho série, 7 segments, DHT22, HC-SR04, MPU6050 IMU, détecteur PIR, servo, joystick."
+      },
+      "esp32c3": {
+        "title": "ESP32-C3 RISC-V (9 exemples)",
+        "body": "Blink, série, LED RGB, bouton + LED, écho série, DHT22, HC-SR04, PIR, servo."
+      },
+      "mega": {
+        "title": "Arduino Mega (5 exemples)",
+        "body": "Blink, chenillard LED, écho série, contrôle série, afficheur 7 segments."
+      },
+      "nano": {
+        "title": "Arduino Nano (4 exemples)",
+        "body": "Blink, bouton LED, fondu, écho série. Plus contrôle multi-cartes Pi vers Arduino."
+      }
+    },
+    "outcomeHeading": "Le résultat",
+    "outcomeLead": "Logicraft Studio 2.0 transforme le projet en un simulateur de systèmes embarqués multi-plateforme complet et évolutif.",
+    "outcome": {
+      "realistic": "Émulation plus réaliste",
+      "realisticBody": "Émulation Xtensa, RISC-V et ARM basée sur QEMU. AVR8 précis au cycle près via avr8js. Exécution réelle du firmware, pas d'approximations.",
+      "broader": "Support matériel élargi",
+      "broaderBody": "19 cartes sur 5 architectures CPU. Du ATtiny85 8 bits au Raspberry Pi 3B quad-core exécutant un Linux complet.",
+      "devEx": "Meilleure expérience développeur",
+      "devExBody": "Éditeur Monaco, espace de travail multi-fichiers, gestionnaire de bibliothèques, oscilloscope, panneau de contrôle des capteurs, design responsive mobile."
+    },
+    "builtOnOss": "Construit sur l'open-source",
+    "builtOnOssLead": "Logicraft Studio est propulsé par ces projets open-source. Sans eux, rien de tout cela ne serait possible.",
+    "bottom": {
+      "title": "Essayez Logicraft Studio 2.0 maintenant",
+      "body": "Ouvrez l'éditeur et commencez à simuler — 19 cartes, 68+ exemples, zéro configuration.",
+      "cta": "Lancer le simulateur"
+    }
+  },
+  "v25": {
+    "versionBadge": "Version 2.5",
+    "heroAccent": "Arduino rencontre SPICE dans votre navigateur",
+    "heroSubtitle": "Simulation de circuits analogiques en temps réel via ngspice-WASM, câblée à Arduino, ESP32 et Raspberry Pi Pico. Résistances, condensateurs, amplificateurs opérationnels, transistors, ampèremètres et voltmètres en direct — co-simulés avec votre firmware. Gratuit, open-source, sans installation.",
+    "tryV25": "Essayer Logicraft Studio 2.5",
+    "fullEmulation": "Du numérique pur à l'émulation complète de circuits",
+    "fullEmulationLead": "Logicraft Studio 2.0 simulait parfaitement votre firmware. Logicraft Studio 2.5 simule le circuit autour — avec le même moteur ngspice utilisé par les outils EDA professionnels, fonctionnant entièrement dans votre onglet de navigateur.",
+    "notLinear": "Pas une approximation linéaire",
+    "notLinearBody": "Logicraft Studio résout l'analyse nodale modifiée complète à chaque tick. Les dispositifs non linéaires — diodes, BJT, MOSFET, amplificateurs opérationnels avec saturation — se comportent comme les vrais, pas comme des idéalisations de manuel.",
+    "realFirmware": "Vrai firmware. Vrai circuit. Même canevas.",
+    "realFirmwareBody": "Les broches GPIO pilotent les nœuds SPICE comme sources de tension. Les entrées ADC lisent les tensions de nœud résolues. analogRead() retourne ce que le circuit produit réellement — pas un raccourci simulé.",
+    "browserOffline": "100% navigateur, 100% hors ligne",
+    "browserOfflineBody": "ngspice compilé en WebAssembly via le moteur open-source eecircuit-engine. Pas de serveur, pas de cloud, pas de compte. Fonctionne hors ligne après le premier chargement. Vos circuits ne quittent jamais votre machine.",
+    "catalogHeading": "100+ composants précis SPICE",
+    "catalogLead": "Un catalogue électronique complet — passifs, semi-conducteurs, logique, instruments — chacun modélisé avec de vraies cartes de dispositif ngspice, pas des substituts comportementaux.",
+    "coSimHeading": "Co-simulation hybride numérique + analogique",
+    "coSimLead": "La plupart des simulateurs de navigateur exécutent soit votre firmware, soit un circuit — jamais les deux ensemble. Logicraft Studio 2.5 les résout sur la même horloge.",
+    "driveMotor": "Piloter un moteur depuis une broche Arduino",
+    "driveMotorBody": "Broche HIGH → grille MOSFET → courant de drain à travers une charge inductive réelle → force contre-électromotrice via une diode de roue libre. Le tout résolu par SPICE. Visualisez les tensions de grille et de drain côte à côte.",
+    "readSensor": "Lire un capteur via un véritable amplificateur opérationnel",
+    "readSensorBody": "Photodiode → amplificateur transimpédance → ADC. Ajustez le curseur de lux et regardez analogRead() répondre à travers l'étage d'amplification réel — saturation, slew rate, et tout.",
+    "liveInstruments": "Déboguer avec des instruments en direct",
+    "liveInstrumentsBody": "Placez un ampèremètre entre deux nœuds, un voltmètre sur n'importe quel nœud. L'oscilloscope capture les broches numériques et les nœuds analogiques ensemble. Pas de \"et si\" — juste des mesures.",
+    "examplesHeading": "40 nouveaux exemples analogiques et hybrides",
+    "examplesLead": "Circuits pré-câblés que vous pouvez ouvrir en un clic — des fondamentaux des manuels aux systèmes réalistes Arduino+analogique.",
+    "examples": {
+      "fundamentals": {
+        "title": "Fondamentaux",
+        "body": "Diviseur de tension, filtre passe-bas RC, filtre passe-haut RC, circuit LR, charge de condensateur, résonance RLC, pont de Wheatstone."
+      },
+      "diodes": {
+        "title": "Diodes et redresseurs",
+        "body": "Redresseur demi-onde, redresseur en pont double alternance, régulateur Zener, clampeur, écrêteur, doubleur de tension."
+      },
+      "opamps": {
+        "title": "Circuits à amplificateurs opérationnels",
+        "body": "Amplificateur inverseur, amplificateur non-inverseur, amplificateur sommateur, amplificateur différentiel, intégrateur, différenciateur, trigger de Schmitt, comparateur."
+      },
+      "transistors": {
+        "title": "Circuits à transistors",
+        "body": "Amplificateur émetteur commun, interrupteur à transistor, paire de Darlington, driver MOSFET, pont en H, miroir de courant."
+      },
+      "arduino": {
+        "title": "Arduino + analogique",
+        "body": "LED pilotée par PWM avec lissage RC, driver moteur MOSFET contrôlé par Arduino, relais opto-isolé, pipeline photodiode + amplificateur opérationnel + ADC."
+      },
+      "sensors": {
+        "title": "Capteurs",
+        "body": "Pont de thermistance NTC, luxmètre à photorésistance, transimpédance à photodiode, variateur à potentiomètre, détecteur de flamme."
+      }
+    },
+    "outcomeHeading": "Le résultat",
+    "outcomeLead": "Logicraft Studio 2.5 ferme la boucle entre firmware et matériel : le même outil qui exécute votre sketch résout maintenant le circuit autour.",
+    "outcome": {
+      "teach": "Enseigner et apprendre l'électronique",
+      "teachBody": "Un terrain de jeu SPICE gratuit dans le navigateur pour les étudiants — avec l'avantage supplémentaire de piloter un vrai firmware de microcontrôleur. Pas de licence, pas d'installation, pas de réservation de labo.",
+      "prototype": "Prototyper avant de souder",
+      "prototypeBody": "Validez les frontaux analogiques, les étages de puissance et les pipelines de capteurs de bout en bout avant de commander une seule pièce. L'oscilloscope et le multimètre sont déjà sur l'établi.",
+      "openSource": "Toujours 100% open source",
+      "openSourceBody": "AGPL-3.0 sur GitHub. Construit sur ngspice, eecircuit-engine, avr8js, rp2040js, QEMU et wokwi-elements. Forkez-le, hébergez-le, étendez-le."
+    },
+    "builtOnOssLead": "Logicraft Studio 2.5 repose sur des décennies d'outillage électronique open-source. Un immense merci aux mainteneurs de chaque projet ci-dessous.",
+    "bottom": {
+      "title": "Essayez Logicraft Studio 2.5 maintenant",
+      "body": "Ouvrez l'éditeur et commencez à simuler — firmware et circuit analogique, même canevas, zéro configuration."
+    }
+  },
+  "v3": {
+    "versionBadge": "Version 3.0",
+    "heroAccent": "CPU rétro, systèmes multi-cartes, précision de circuit complète",
+    "heroSubtitle": "Logicraft Studio 3.0 est la plus grande version à ce jour. Programmez les classiques Z80, 8080 et 4004, émulez des cartes MicroSD et des écrans ePaper, câblez des systèmes multi-cartes entiers, et annulez toute erreur sur le canevas. Plus de 100 nouveaux exemples — tous gratuits, open-source, et fonctionnant dans votre navigateur.",
+    "tryV3": "Essayer Logicraft Studio 3.0",
+    "whatsNewHeading": "La plus grande version de Logicraft Studio à ce jour",
+    "whatsNewLead": "Logicraft Studio 2.5 a apporté les circuits analogiques réels. Logicraft Studio 3.0 s'étend dans toutes les directions à la fois — nouveaux processeurs, stockage et affichages, véritables systèmes multi-cartes, simulation plus précise, et le polish d'éditeur que vous attendiez.",
+    "retroTitle": "CPU classiques, entièrement programmables",
+    "retroBody": "Déposez un Z80, 8080, 4004, 4040 ou 8086 sur le canevas, chargez votre propre ROM, et écrivez de l'assembleur directement dans l'éditeur — aucune carte hôte requise.",
+    "multiBoardTitle": "Systèmes entiers, pas des cartes isolées",
+    "multiBoardBody": "Câblez UART, I2C, SPI et GPIO simple à travers toutes les cartes supportées. Un ESP32 parlant à un Pico parlant à un Arduino, le tout résolu sur la même horloge.",
+    "polishTitle": "Annuler, minimap, édition en direct",
+    "polishBody": "Annulation/rétablissement complet pour chaque action sur le canevas, une minimap déplaçable pour naviguer dans les grandes constructions, et glisser-déposer des pièces pendant que la simulation tourne.",
+    "catalogHeading": "Tout ce qui est nouveau dans 3.0",
+    "catalogLead": "Une visite complète de la version — nouveaux processeurs, stockage et affichages, interconnexion multi-cartes, précision de simulation, performances, et plus d'une centaine d'exemples frais.",
+    "examplesHeading": "100+ nouveaux exemples dans la galerie",
+    "examplesLead": "Pico Doom, aperçus ESP32-CAM, tableaux de bord ePaper, démos de CPU rétro, une série 100 Days of IoT, et des dizaines de circuits analogiques — chacun à un clic.",
+    "outcomeHeading": "Le résultat",
+    "outcomeLead": "Logicraft Studio 3.0 transforme un simulateur de cartes en un véritable poste de travail pour systèmes embarqués : processeurs, périphériques, stockage, affichages et circuits, ensemble dans un seul onglet de navigateur.",
+    "outcome": {
+      "build": "Construire des systèmes complets",
+      "buildBody": "Projets multi-cartes avec de véritables liaisons UART/I2C/SPI, stockage MicroSD, et sortie ePaper ou webcam — prototypés de bout en bout avant de toucher au matériel.",
+      "learn": "Apprendre du rétro au moderne",
+      "learnBody": "Tracez un Intel 4004 4 bits instruction par instruction, puis passez à un RISC-V 32 bits ou une carte ARM Linux quad-core — le même canevas, les mêmes outils.",
+      "openSource": "Toujours 100% open source",
+      "openSourceBody": "AGPL-3.0 sur GitHub. Pas de compte, pas de cloud, pas d'installation. Forkez-le, auto-hébergez-le, étendez-le."
+    },
+    "builtOnOssLead": "Logicraft Studio 3.0 repose sur des décennies de travail open-source en émulation et EDA. Un immense merci aux mainteneurs de chaque projet ci-dessous.",
+    "bottom": {
+      "title": "Essayez Logicraft Studio 3.0 maintenant",
+      "body": "Ouvrez l'éditeur et commencez à construire — processeurs, périphériques, circuits et systèmes multi-cartes, avec zéro configuration."
+    }
+  }
+}

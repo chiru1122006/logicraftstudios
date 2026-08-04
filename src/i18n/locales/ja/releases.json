@@ -1,0 +1,165 @@
+{
+  "v2": {
+    "versionBadge": "バージョン2.0",
+    "heroAccent": "マルチプラットフォーム組み込みシミュレータ",
+    "heroSubtitle": "ブラウザ上でArduino、ESP32、Raspberry Pi Pico、Raspberry Pi 3をシミュレート。19種類のボード、68以上のすぐに使えるサンプル、リアルなセンサーシミュレーション。無料、オープンソース、インストール不要。",
+    "tryV2": "Logicraft Studio 2.0を試す",
+    "joinDiscord": "Discordに参加",
+    "boardsHeading": "19ボード。5アーキテクチャ。1つのツール。",
+    "boardsLead": "8ビットAVRからクアッドコアARM Linuxまで — Logicraft Studio 2.0は、主要な組み込みプラットフォームすべてを1つのブラウザタブでエミュレートします。",
+    "multipleBoards": "1つの回路に複数のボード",
+    "mixArchitectures": "アーキテクチャの混在",
+    "mixArchitecturesBody": "ESP32をRaspberry Pi 3に接続し、3つのArduinoを配線し、PicoとESP32-C3を組み合わせる。どの組み合わせでも動作します。",
+    "realInterBoard": "実際のボード間通信",
+    "realInterBoardBody": "ボードは有線接続（UART、I2C、SPI、または単純なGPIO信号）を介して通信します。実際のハードウェアと同じです。",
+    "uniqueFeature": "他のシミュレータにはない機能",
+    "uniqueFeatureBody": "従来のシミュレータは1つのボードを単独でエミュレートします。Logicraft Studioは複数のボードが同時に動作するシステム全体をシミュレートします。",
+    "whatsNew": "2.0の新機能",
+    "whatsNewLead": "マルチプラットフォーム組み込みシステムシミュレータへの完全な変革 — より多くのボード、より正確なエミュレーション、より優れた開発者体験。",
+    "examplesHeading": "68以上のすぐに使えるサンプル",
+    "examplesLead": "基本的なLED点滅からマルチボード通信まで — あらゆるプラットフォームとスキルレベルに対応したサンプル。",
+    "examples": {
+      "arduino": {
+        "title": "Arduino（17サンプル）",
+        "body": "点滅、信号機、ボタン、フェード、RGB LED、Simon Saysゲーム、TFTディスプレイ、LCD、I2Cスキャナ、SPIループバックなど。"
+      },
+      "pico": {
+        "title": "Raspberry Pi Pico（18サンプル）",
+        "body": "点滅、シリアル、I2C（スキャナ、RTC、EEPROM）、SPI、ADC読み取り、DHT22、HC-SR04、サーボ、ジョイスティック、NTCセンサー。"
+      },
+      "esp32": {
+        "title": "ESP32（9サンプル）",
+        "body": "点滅、シリアルエコー、7セグメント、DHT22、HC-SR04、MPU6050 IMU、PIRモーション、サーボ、ジョイスティック。"
+      },
+      "esp32c3": {
+        "title": "ESP32-C3 RISC-V（9サンプル）",
+        "body": "点滅、シリアル、RGB LED、ボタン+LED、シリアルエコー、DHT22、HC-SR04、PIR、サーボ。"
+      },
+      "mega": {
+        "title": "Arduino Mega（5サンプル）",
+        "body": "点滅、LEDチェイス、シリアルエコー、シリアル制御、7セグメントディスプレイ。"
+      },
+      "nano": {
+        "title": "Arduino Nano（4サンプル）",
+        "body": "点滅、ボタンLED、フェード、シリアルエコー。さらにマルチボードPi-to-Arduino制御。"
+      }
+    },
+    "outcomeHeading": "成果",
+    "outcomeLead": "Logicraft Studio 2.0はプロジェクトを完全でスケーラブルなマルチプラットフォーム組み込みシステムシミュレータに変革します。",
+    "outcome": {
+      "realistic": "よりリアルなエミュレーション",
+      "realisticBody": "QEMUベースのXtensa、RISC-V、ARMエミュレーション。avr8jsによるサイクル精度のAVR8。近似ではなく実際のファームウェア実行。",
+      "broader": "より広範なハードウェアサポート",
+      "broaderBody": "5つのCPUアーキテクチャにわたる19ボード。8ビットATtiny85から完全なLinuxを実行するクアッドコアRaspberry Pi 3Bまで。",
+      "devEx": "より優れた開発者体験",
+      "devExBody": "Monacoエディタ、マルチファイルワークスペース、ライブラリマネージャ、オシロスコープ、センサー制御パネル、モバイル対応デザイン。"
+    },
+    "builtOnOss": "オープンソース上に構築",
+    "builtOnOssLead": "Logicraft Studioはこれらのオープンソースプロジェクトによって支えられています。それらなしでは、これは実現不可能でした。",
+    "bottom": {
+      "title": "今すぐLogicraft Studio 2.0を試す",
+      "body": "エディタを開いてシミュレーションを開始 — 19ボード、68以上のサンプル、セットアップ不要。",
+      "cta": "シミュレータを起動"
+    }
+  },
+  "v25": {
+    "versionBadge": "バージョン2.5",
+    "heroAccent": "ArduinoとSPICEがブラウザで出会う",
+    "heroSubtitle": "ngspice-WASMによるリアルタイムアナログ回路シミュレーション。Arduino、ESP32、Raspberry Pi Picoに配線。抵抗、コンデンサ、オペアンプ、トランジスタ、ライブ電流計と電圧計 — ファームウェアと同時シミュレーション。無料、オープンソース、インストール不要。",
+    "tryV25": "Logicraft Studio 2.5を試す",
+    "fullEmulation": "デジタル専用から完全回路エミュレーションへ",
+    "fullEmulationLead": "Logicraft Studio 2.0はファームウェアを完璧にシミュレートしました。Logicraft Studio 2.5はその周辺の回路をシミュレートします — プロフェッショナルEDAツールと同じngspiceエンジンを使用し、すべてブラウザタブ内で動作します。",
+    "notLinear": "線形近似ではない",
+    "notLinearBody": "Logicraft Studioは毎ティック完全な修正節点解析を解きます。非線形デバイス — ダイオード、BJT、MOSFET、飽和を伴うオペアンプ — は、教科書的な理想化ではなく、実際の動作を再現します。",
+    "realFirmware": "実際のファームウェア。実際の回路。同じキャンバス。",
+    "realFirmwareBody": "GPIOピンは電圧源としてSPICEネットを駆動します。ADC入力は解かれたノード電圧を読み取ります。analogRead()は回路が実際に生成する値を返します — シミュレートされた近道ではありません。",
+    "browserOffline": "100%ブラウザ、100%オフライン",
+    "browserOfflineBody": "ngspiceはオープンソースのeecircuit-engineを介してWebAssemblyにコンパイルされています。サーバー不要、クラウド不要、アカウント不要。初回読み込み後はオフラインで動作。回路がマシンを離れることはありません。",
+    "catalogHeading": "100以上のSPICE精度コンポーネント",
+    "catalogLead": "完全な電子部品カタログ — パッシブ、半導体、ロジック、計測器 — すべて実際のngspiceデバイスカードでモデル化されており、動作の代用ではありません。",
+    "coSimHeading": "ハイブリッドデジタル+アナログ同時シミュレーション",
+    "coSimLead": "ほとんどのブラウザシミュレータはファームウェアか回路のどちらか一方しか実行しません — 両方を同時に実行することはありません。Logicraft Studio 2.5は同じクロックで両方を解きます。",
+    "driveMotor": "Arduinoピンからモーターを駆動",
+    "driveMotorBody": "ピンHIGH → MOSFETゲート → 実際の誘導負荷を通るドレイン電流 → フライバックダイオードを通る逆起電力。すべてSPICEで解決。ゲートとドレインの電圧を並べて観測。",
+    "readSensor": "実際のオペアンプを通してセンサーを読み取る",
+    "readSensorBody": "フォトダイオード → トランスインピーダンスオペアンプ → ADC。照度スライダーを調整すると、実際の増幅段（飽和、スルーレートなど）を通してanalogRead()が応答するのを確認できます。",
+    "liveInstruments": "ライブ計測器でデバッグ",
+    "liveInstrumentsBody": "任意の2ノード間に電流計、任意のネットに電圧計を配置。オシロスコープはデジタルピンとアナログノードを同時にキャプチャ。「もしも」ではなく、測定値です。",
+    "examplesHeading": "40の新しいアナログ＆ハイブリッドサンプル",
+    "examplesLead": "ワンクリックで開ける事前配線済み回路 — 教科書の基礎から現実的なArduino+アナログシステムまで。",
+    "examples": {
+      "fundamentals": {
+        "title": "基礎",
+        "body": "分圧器、RCローパスフィルタ、RCハイパスフィルタ、LR回路、コンデンサ充電、RLC共振、ホイートストンブリッジ。"
+      },
+      "diodes": {
+        "title": "ダイオード＆整流器",
+        "body": "半波整流器、全波ブリッジ整流器、ツェナーレギュレータ、クランパ、クリッパ、倍電圧整流器。"
+      },
+      "opamps": {
+        "title": "オペアンプ回路",
+        "body": "反転増幅器、非反転増幅器、加算増幅器、差動増幅器、積分器、微分器、シュミットトリガ、コンパレータ。"
+      },
+      "transistors": {
+        "title": "トランジスタ回路",
+        "body": "エミッタ接地増幅器、トランジスタスイッチ、ダーリントンペア、MOSFETドライバ、Hブリッジ、カレントミラー。"
+      },
+      "arduino": {
+        "title": "Arduino＋アナログ",
+        "body": "PWM駆動LEDとRC平滑化、Arduino制御MOSFETモータドライバ、フォトカプラ絶縁リレー、フォトダイオード＋オペアンプ＋ADCパイプライン。"
+      },
+      "sensors": {
+        "title": "センサー",
+        "body": "NTCサーミスタブリッジ、フォトレジスタ照度計、フォトダイオードトランスインピーダンス、ポテンショメータ調光器、火炎検出器。"
+      }
+    },
+    "outcomeHeading": "成果",
+    "outcomeLead": "Logicraft Studio 2.5はファームウェアとハードウェアのループを閉じます：スケッチを実行する同じツールが、その周辺の回路も解きます。",
+    "outcome": {
+      "teach": "電子工学の教育と学習",
+      "teachBody": "学生向けの無料ブラウザベースSPICEプレイグラウンド — 実際のマイクロコントローラファームウェアを駆動できる利点も。ライセンス不要、インストール不要、実験室予約不要。",
+      "prototype": "はんだ付け前にプロトタイプ",
+      "prototypeBody": "アナログフロントエンド、電源段、センサーパイプラインを、部品を注文する前にエンドツーエンドで検証。オシロスコープとDMMはすでにベンチ上にあります。",
+      "openSource": "依然として100%オープンソース",
+      "openSourceBody": "GitHub上でAGPL-3.0。ngspice、eecircuit-engine、avr8js、rp2040js、QEMU、wokwi-elements上に構築。フォークして、ホストして、拡張してください。"
+    },
+    "builtOnOssLead": "Logicraft Studio 2.5は数十年にわたる電子工学ツールの肩の上に立っています。以下の各プロジェクトのメンテナに多大なる感謝を。",
+    "bottom": {
+      "title": "今すぐLogicraft Studio 2.5を試す",
+      "body": "エディタを開いてシミュレーションを開始 — ファームウェアとアナログ回路、同じキャンバス、セットアップ不要。"
+    }
+  },
+  "v3": {
+    "versionBadge": "バージョン3.0",
+    "heroAccent": "レトロCPU、マルチボードシステム、完全回路精度",
+    "heroSubtitle": "Logicraft Studio 3.0はこれまでで最大のリリースです。クラシックなZ80、8080、4004プロセッサをプログラムし、MicroSDカードやePaperディスプレイをエミュレートし、複数のボードシステム全体を配線し、キャンバス上のあらゆるミスを取り消せます。100以上の新しいサンプル — すべて無料、オープンソース、ブラウザで動作。",
+    "tryV3": "Logicraft Studio 3.0を試す",
+    "whatsNewHeading": "これまでで最大のLogicraft Studioリリース",
+    "whatsNewLead": "Logicraft Studio 2.5は本物のアナログ回路をもたらしました。Logicraft Studio 3.0はあらゆる方向に同時に拡張します — 新しいプロセッサ、ストレージとディスプレイ、真のマルチボードシステム、よりシャープなシミュレーション、そして皆さんが求めていたエディタの洗練。",
+    "retroTitle": "クラシックCPU、完全プログラム可能",
+    "retroBody": "Z80、8080、4004、4040、8086をキャンバスにドロップし、独自のROMをロードし、エディタで直接アセンブリを記述 — ホストボードは不要。",
+    "multiBoardTitle": "単一ボードではなくシステム全体",
+    "multiBoardBody": "サポートされているすべてのボード間でUART、I2C、SPI、プレーンGPIOを配線。ESP32がPicoと通信し、PicoがArduinoと通信、すべて同じクロックで解決。",
+    "polishTitle": "アンドゥ、ミニマップ、ライブ編集",
+    "polishBody": "すべてのキャンバス操作に対する完全なアンドゥ/リドゥ、大きなビルドをナビゲートするドラッグ可能なミニマップ、シミュレーション実行中のパーツのドラッグ移動。",
+    "catalogHeading": "3.0のすべての新機能",
+    "catalogLead": "リリースの完全なツアー — 新しいプロセッサ、ストレージとディスプレイ、マルチボード相互接続、シミュレーション精度、パフォーマンス、そして100以上の新しいサンプル。",
+    "examplesHeading": "100以上の新しいギャラリーサンプル",
+    "examplesLead": "Pico Doom、ESP32-CAMプレビュー、ePaperダッシュボード、レトロCPUデモ、100 Days of IoTシリーズ、数十のアナログ回路 — すべてワンクリックでアクセス可能。",
+    "outcomeHeading": "成果",
+    "outcomeLead": "Logicraft Studio 3.0はボードシミュレータを完全な組み込みシステムワークベンチに変えます：プロセッサ、ペリフェラル、ストレージ、ディスプレイ、回路が1つのブラウザタブに。",
+    "outcome": {
+      "build": "完全なシステムを構築",
+      "buildBody": "実際のUART/I2C/SPIリンク、MicroSDストレージ、ePaperまたはウェブカメラ出力を備えたマルチボードプロジェクト — ハードウェアに触れる前にエンドツーエンドでプロトタイプ。",
+      "learn": "レトロからモダンまで学ぶ",
+      "learnBody": "4ビットIntel 4004の命令を1つずつトレースし、その後32ビットRISC-VまたはクアッドコアARM Linuxボードにジャンプ — 同じキャンバス、同じツール。",
+      "openSource": "依然として100%オープンソース",
+      "openSourceBody": "GitHub上でAGPL-3.0。アカウント不要、クラウド不要、インストール不要。フォークして、セルフホストして、拡張してください。"
+    },
+    "builtOnOssLead": "Logicraft Studio 3.0は数十年にわたるオープンソースのエミュレーションとEDAの仕事の上に立っています。以下の各プロジェクトのメンテナに多大なる感謝を。",
+    "bottom": {
+      "title": "今すぐLogicraft Studio 3.0を試す",
+      "body": "エディタを開いて構築を開始 — プロセッサ、ペリフェラル、回路、マルチボードシステム、セットアップ不要。"
+    }
+  }
+}

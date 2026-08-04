@@ -1,0 +1,398 @@
+/* Velxio Desktop overlay styles — only loaded when VITE_DESKTOP=true. */
+
+.vlx-desktop-welcome {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: #0c0c11;
+  color: #e6e6e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.vlx-desktop-welcome-card {
+  width: min(440px, 92vw);
+  padding: 36px;
+  background: #15151b;
+  border: 1px solid #2c2c33;
+  border-radius: 12px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+}
+
+.vlx-desktop-welcome-brand h1 {
+  margin: 0 0 6px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.vlx-desktop-welcome-brand p {
+  margin: 0 0 24px;
+  color: #888;
+  font-size: 14px;
+}
+
+.vlx-desktop-welcome-error {
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  background: #3a1a1a;
+  border: 1px solid #6a2a2a;
+  color: #ff8585;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.vlx-desktop-welcome-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.vlx-desktop-welcome-primary,
+.vlx-desktop-welcome-secondary,
+.vlx-desktop-welcome-link {
+  padding: 12px 16px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: filter 0.12s ease, transform 0.05s ease;
+  font-family: inherit;
+}
+
+.vlx-desktop-welcome-primary {
+  background: linear-gradient(135deg, var(--color-action-primary) 0%, #005ea1 100%);
+  color: #fff;
+  border: 1px solid #005ea1;
+  font-weight: 600;
+}
+
+.vlx-desktop-welcome-primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.vlx-desktop-welcome-primary:disabled,
+.vlx-desktop-welcome-secondary:disabled,
+.vlx-desktop-welcome-link:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.vlx-desktop-welcome-secondary {
+  background: transparent;
+  color: #e6e6e9;
+  border: 1px solid #2c2c33;
+}
+
+.vlx-desktop-welcome-secondary:hover:not(:disabled) {
+  background: #1c1c22;
+}
+
+.vlx-desktop-welcome-link {
+  background: transparent;
+  color: #888;
+  border: none;
+  font-size: 13px;
+  padding: 6px;
+}
+
+.vlx-desktop-welcome-link:hover:not(:disabled) {
+  color: #ccc;
+  text-decoration: underline;
+}
+
+.vlx-desktop-welcome-paste label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.vlx-desktop-welcome-paste input {
+  width: 100%;
+  padding: 10px 12px;
+  background: #0c0c11;
+  color: #e6e6e9;
+  border: 1px solid #2c2c33;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+}
+
+.vlx-desktop-welcome-paste input:focus {
+  outline: none;
+  border-color: var(--color-action-primary);
+}
+
+.vlx-desktop-welcome-trust {
+  margin: 16px 0 0;
+  color: #666;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* ── Grace banner (Phase 4) ─────────────────────────────────── */
+
+.vlx-desktop-grace {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 18px;
+  color: #fff;
+  font-size: 13px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+.vlx-desktop-grace-warn {
+  background: linear-gradient(180deg, #b58800 0%, #8c6800 100%);
+  border-bottom: 1px solid #5c4500;
+}
+
+.vlx-desktop-grace-error {
+  background: linear-gradient(180deg, #b03333 0%, #8c2222 100%);
+  border-bottom: 1px solid #5c1818;
+}
+
+.vlx-desktop-grace-text {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.vlx-desktop-grace-cta {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.vlx-desktop-grace-cta:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.vlx-desktop-grace-cta:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.vlx-desktop-grace-dismiss {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.vlx-desktop-grace-dismiss:hover {
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
+}
+
+/* Indeterminate progress strip used by Esp32QemuPrompt while
+   streaming a body without a Content-Length header. */
+@keyframes vlx-indeterminate {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+
+/* ── Lockout overlay (v0.3.0+) ─────────────────────────────── */
+
+.vlx-desktop-lockout {
+  position: fixed;
+  inset: 0;
+  z-index: 10001; /* above the welcome (10000) so a stale welcome can't peek through */
+  background: rgba(8, 8, 12, 0.96);
+  color: #e6e6e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Block all clicks from leaking through to the editor underneath. */
+  pointer-events: auto;
+}
+
+.vlx-desktop-lockout-card {
+  width: min(460px, 92vw);
+  padding: 36px;
+  background: #15151b;
+  border: 1px solid #2c2c33;
+  border-radius: 12px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7);
+}
+
+.vlx-desktop-lockout-brand h1 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.vlx-desktop-lockout-brand p {
+  margin: 0 0 24px;
+  color: #aaa;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Editor-side hook: when the body has this class, Save / Compile /
+   Run buttons style themselves as disabled. Upstream's CSS uses
+   `.editor-button` for the toolbar — we override its appearance and
+   the SPA's onClick handlers gate themselves via the grace status. */
+body.vlx-desktop-readonly .editor-button,
+body.vlx-desktop-readonly [data-velxio-action="compile"],
+body.vlx-desktop-readonly [data-velxio-action="save"] {
+  opacity: 0.4;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* ── Update-available toast (v0.4.0+) ──────────────────────── */
+
+.vlx-desktop-update-toast {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 9700; /* above grace banner (9000), below lockout (10001) */
+  width: 340px;
+  max-width: calc(100vw - 32px);
+  padding: 16px;
+  background: #1a1d24;
+  color: #e6e6e9;
+  border: 1px solid #2c2c33;
+  border-radius: 8px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  animation: vlx-update-toast-in 0.25s ease;
+}
+
+@keyframes vlx-update-toast-in {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.vlx-desktop-update-toast-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.vlx-desktop-update-toast-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--color-action-primary) 0%, #005ea1 100%);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.vlx-desktop-update-toast-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.vlx-desktop-update-toast-version {
+  font-size: 12px;
+  color: #888;
+}
+
+.vlx-desktop-update-toast-notes {
+  margin: 8px 0 12px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+  font-size: 12px;
+  color: #aaa;
+  line-height: 1.45;
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+.vlx-desktop-update-toast-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.vlx-desktop-update-toast-primary {
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, var(--color-action-primary) 0%, #005ea1 100%);
+  border: 1px solid #005ea1;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.vlx-desktop-update-toast-primary:hover {
+  filter: brightness(1.1);
+}
+
+.vlx-desktop-update-toast-secondary {
+  padding: 7px 14px;
+  font-size: 13px;
+  color: #aaa;
+  background: transparent;
+  border: 1px solid #2c2c33;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.vlx-desktop-update-toast-secondary:hover {
+  background: #232730;
+  color: #ddd;
+}
+
+.vlx-desktop-update-toast-progress {
+  margin: 12px 0 6px;
+  height: 6px;
+  background: #0c0c11;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.vlx-desktop-update-toast-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-action-primary) 0%, #00a4ff 100%);
+  transition: width 0.2s ease;
+}
+
+.vlx-desktop-update-toast-progress-label {
+  font-size: 11px;
+  color: #888;
+  font-variant-numeric: tabular-nums;
+}
