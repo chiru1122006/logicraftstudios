@@ -18,8 +18,6 @@ import raspberryPi3Svg from '../assets/Raspberry_Pi_3_illustration.svg';
 import './LandingPage.css';
 
 const GITHUB_URL = 'https://github.com/chiru1122006';
-const PAYPAL_URL = 'https://paypal.me/odoonext';
-const GITHUB_SPONSORS_URL = 'https://github.com/sponsors/chiru1122006';
 
 /* GitHub keeps a custom (filled) glyph — Lucide's outline doesn't match the brand. */
 const IcoGitHub = () => (
@@ -588,21 +586,7 @@ const features = [
   { icon: <IcoCode />,    key: 'monaco' },
 ] as const;
 
-/* ── Sponsor SVG icon ─────────────────────────────────── */
-const IcoSponsor = () => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="12" cy="12" r="10" />
-    <path d="M12 6v6l4 2" />
-    <path d="M8 14h.01M12 18h.01M16 14h.01" />
-  </svg>
-);
+
 
 
 /* ── Component ────────────────────────────────────────── */
@@ -1090,108 +1074,7 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Pricing */}
-      <section className="landing-section landing-section-alt landing-pricing">
-        <div className="section-header">
-          <span className="section-label">{t('landing.pricing.label')}</span>
-          <h2 className="section-title">{t('landing.pricing.title')}</h2>
-          <p className="section-sub">{t('landing.pricing.subtitle')}</p>
-        </div>
-        <div className="pricing-grid">
-          <div className="pricing-card">
-            <div className="pricing-card-name">{t('landing.pricing.tiers.free.name')}</div>
-            <div className="pricing-card-price">
-              <span className="pricing-card-amount">$0</span>
-              <span className="pricing-card-period">/mo</span>
-            </div>
-            <p className="pricing-card-tagline">{t('landing.pricing.tiers.free.tagline')}</p>
-            <ul className="pricing-card-features">
-              <li>{t('landing.pricing.tiers.free.f1')}</li>
-              <li>{t('landing.pricing.tiers.free.f2')}</li>
-              <li>{t('landing.pricing.tiers.free.f3')}</li>
-            </ul>
-            <Link to={localize('/editor')} className="pricing-card-cta pricing-card-cta-secondary">
-              {t('landing.pricing.tiers.free.cta')}
-            </Link>
-          </div>
-          <div className="pricing-card">
-            <div className="pricing-card-name">{t('landing.pricing.tiers.maker.name')}</div>
-            <div className="pricing-card-price">
-              <span className="pricing-card-amount">$7</span>
-              <span className="pricing-card-period">/mo</span>
-            </div>
-            <p className="pricing-card-tagline">{t('landing.pricing.tiers.maker.tagline')}</p>
-            <ul className="pricing-card-features">
-              <li>{t('landing.pricing.tiers.maker.f1')}</li>
-              <li>{t('landing.pricing.tiers.maker.f2')}</li>
-              <li>{t('landing.pricing.tiers.maker.f3')}</li>
-            </ul>
-            <Link to={localize('/pricing')} className="pricing-card-cta pricing-card-cta-secondary">
-              {t('landing.pricing.tiers.maker.cta')}
-            </Link>
-          </div>
-          <div className="pricing-card pricing-card-featured">
-            <div className="pricing-card-badge">{t('landing.pricing.popular')}</div>
-            <div className="pricing-card-name">{t('landing.pricing.tiers.pro.name')}</div>
-            <div className="pricing-card-price">
-              <span className="pricing-card-amount">$19</span>
-              <span className="pricing-card-period">/mo</span>
-            </div>
-            <p className="pricing-card-tagline">{t('landing.pricing.tiers.pro.tagline')}</p>
-            <ul className="pricing-card-features">
-              <li>{t('landing.pricing.tiers.pro.f1')}</li>
-              <li>{t('landing.pricing.tiers.pro.f2')}</li>
-              <li>{t('landing.pricing.tiers.pro.f3')}</li>
-            </ul>
-            <Link to={localize('/pricing')} className="pricing-card-cta pricing-card-cta-primary">
-              {t('landing.pricing.tiers.pro.cta')}
-            </Link>
-          </div>
-        </div>
-        <div className="pricing-classroom-banner">
-          <span>
-            {t(
-              'landing.pricing.classroomBanner',
-              'Bringing Logicraft Studio into a course? Logicraft Studio for Classroom gives every student Pro access from $40/year.',
-            )}
-          </span>
-          <Link to={localize('/classroom')} className="pricing-classroom-banner-cta">
-            {t('landing.pricing.classroomCta', 'See classroom plans →')}
-          </Link>
-        </div>
-      </section>
 
-      {/* Support */}
-      <section className="landing-support">
-        <div className="support-content">
-          <div className="support-icon">
-            <IcoSponsor />
-          </div>
-          <h2 className="support-title">{t('landing.support.title')}</h2>
-          <p className="support-sub">{t('landing.support.subtitle')}</p>
-          <div className="support-btns">
-            <a
-              href={GITHUB_SPONSORS_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="support-btn support-btn-gh"
-            >
-              <IcoGitHub /> {t('landing.support.ctaSponsors')}
-            </a>
-            <a
-              href={PAYPAL_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="support-btn support-btn-pp"
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.93 4.778-4.005 7.201-9.138 7.201h-2.19a.563.563 0 0 0-.556.479l-1.187 7.527h-.506l-.24 1.516a.56.56 0 0 0 .554.647h3.882c.46 0 .85-.334.922-.788.06-.26.76-4.852.816-5.09a.932.932 0 0 1 .923-.788h.58c3.76 0 6.705-1.528 7.565-5.946.36-1.847.174-3.388-.777-4.471z" />
-              </svg>
-              {t('landing.support.ctaPaypal')}
-            </a>
-          </div>
-        </div>
-      </section>
 
       {/* Licensing */}
       <section className="landing-section landing-licensing">
