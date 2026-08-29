@@ -395,11 +395,11 @@ const ComponentCard: React.FC<ComponentCardProps> = ({ component, onSelect }) =>
     const element = document.createElement(component.tagName);
 
     // Scale factors for different component types
-    let scale = 0.5;
-    if (component.tagName.includes('arduino') || component.tagName.includes('esp32')) {
-      scale = 0.35; // Boards are larger, scale them down more
-    } else if (component.tagName.includes('lcd') || component.tagName.includes('display')) {
-      scale = 0.4; // Displays need a bit more space
+    let scale = 0.52;
+    if (component.tagName.includes('arduino') || component.tagName.includes('esp32') || component.tagName.includes('stm32') || component.tagName.includes('pico')) {
+      scale = 0.32; // Boards are larger, scale down appropriately
+    } else if (component.tagName.includes('lcd') || component.tagName.includes('display') || component.tagName.includes('segment') || component.tagName.includes('tft')) {
+      scale = 0.4; // Displays need medium scaling
     }
 
     (element as HTMLElement).style.transform = `scale(${scale})`;
@@ -522,7 +522,7 @@ const BoardCard: React.FC<BoardCardProps> = ({ kind, onSelect }) => {
     const el = document.createElement(tag) as HTMLElement;
     // Use setAttribute so observedAttributes + connectedCallback read the correct value
     el.setAttribute('board-kind', kind);
-    el.style.transform = 'scale(0.28)';
+    el.style.transform = 'scale(0.24)';
     el.style.transformOrigin = 'center center';
 
     thumbnailRef.current.innerHTML = '';
