@@ -39,7 +39,7 @@ export const AboutPage: React.FC = () => {
       '@context': 'https://schema.org',
       '@type': 'AboutPage',
       name: 'About Logicraft Studio',
-      description: 'Learn about Logicraft Studio and its creator David Montero Crespo.',
+      description: 'Learn about Logicraft Studio and its creator Chiru Deep.',
       url: 'https://logicraftstudios.tech/about',
     },
   });

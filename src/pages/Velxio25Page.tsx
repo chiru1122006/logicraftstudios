@@ -113,7 +113,7 @@ const JSON_LD: object[] = [
       'Logicraft Studio 2.5 brings real-time ngspice-WASM analog simulation to the browser. Hybrid digital+analog co-simulation: resistors, capacitors, inductors, op-amps, transistors, voltmeters, ammeters — wired to Arduino, ESP32, RP2040 GPIO/ADC. 40+ circuit examples. Free and open-source.',
     url: 'https://logicraftstudios.tech/v2-5',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    author: { '@type': 'Person', name: 'David Montero Crespo' },
+    author: { '@type': 'Person', name: 'Chiru Deep' },
     license: 'https://www.gnu.org/licenses/agpl-3.0.html',
   },
   {

@@ -224,7 +224,7 @@ const JSON_LD: object[] = [
       'Logicraft Studio 2.0 — simulate Arduino, ESP32, Raspberry Pi Pico, and Raspberry Pi 3 in your browser. 19 boards, 68+ examples, realistic sensor simulation. Free and open-source.',
     url: 'https://logicraftstudios.tech/v2',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    author: { '@type': 'Person', name: 'David Montero Crespo' },
+    author: { '@type': 'Person', name: 'Chiru Deep' },
     license: 'https://www.gnu.org/licenses/agpl-3.0.html',
   },
   {

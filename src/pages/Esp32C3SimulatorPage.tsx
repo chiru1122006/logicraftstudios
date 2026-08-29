@@ -50,7 +50,7 @@ const JSON_LD: object[] = [
       'Free online ESP32-C3 RISC-V simulator. RV32IMC emulation at 160 MHz via the QEMU lcgamboa backend (libqemu-riscv32). Simulate ESP32-C3 DevKit, XIAO ESP32-C3, SuperMini, and CH32V003.',
     url: 'https://logicraftstudios.tech/esp32-c3-simulator',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    author: { '@type': 'Person', name: 'David Montero Crespo' },
+    author: { '@type': 'Person', name: 'Chiru Deep' },
   },
   {
     '@context': 'https://schema.org',

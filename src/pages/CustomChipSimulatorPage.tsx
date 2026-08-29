@@ -55,7 +55,7 @@ const JSON_LD: object[] = [
       'Define your own integrated circuits in C, Rust, or AssemblyScript using the Wokwi-compatible Custom Chips API. Compile to WebAssembly and drive pins, attributes, timers, I²C and SPI from your simulated chip. Free and open-source.',
     url: 'https://logicraftstudios.tech/custom-chip-simulator',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    author: { '@type': 'Person', name: 'David Montero Crespo' },
+    author: { '@type': 'Person', name: 'Chiru Deep' },
     license: 'https://www.gnu.org/licenses/agpl-3.0.html',
   },
   {

@@ -50,7 +50,7 @@ const JSON_LD: object[] = [
       'Free online ESP32-S3 simulator with real Xtensa LX7 emulation via QEMU at 240 MHz. Simulate ESP32-S3 DevKitC, XIAO ESP32-S3, and Arduino Nano ESP32.',
     url: 'https://logicraftstudios.tech/esp32-s3-simulator',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    author: { '@type': 'Person', name: 'David Montero Crespo' },
+    author: { '@type': 'Person', name: 'Chiru Deep' },
   },
   {
     '@context': 'https://schema.org',

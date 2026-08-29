@@ -10,7 +10,7 @@ const GITHUB_URL = 'https://github.com/chiru1122006';
 const BASE_URL = 'https://logicraftstudios.tech';
 const AUTHOR = {
   '@type': 'Person',
-  name: 'David Montero Crespo',
+  name: 'Chiru Deep',
   url: 'https://github.com/chiru1122006',
 } as const;
 

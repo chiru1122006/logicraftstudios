@@ -50,7 +50,7 @@ const JSON_LD: object[] = [
       'Free online ESP32 simulator with real Xtensa LX6 emulation via QEMU. Simulate ESP32, ESP32-S3, and ESP32-CAM code with 48+ interactive components — no install, no account.',
     url: 'https://logicraftstudios.tech/esp32-simulator',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    author: { '@type': 'Person', name: 'David Montero Crespo' },
+    author: { '@type': 'Person', name: 'Chiru Deep' },
     license: 'https://www.gnu.org/licenses/agpl-3.0.html',
   },
   {

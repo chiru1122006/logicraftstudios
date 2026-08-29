@@ -415,9 +415,9 @@ export const SEO_ROUTES: SeoRoute[] = [
     priority: 0.7,
     changefreq: 'monthly',
     seoMeta: {
-      title: 'About Logicraft Studio — Open Source Embedded Emulator by David Montero Crespo',
+      title: 'About Logicraft Studio — Open Source Embedded Emulator by Chiru Deep',
       description:
-        'Learn about Logicraft Studio, the free open-source multi-board embedded emulator, and its creator David Montero Crespo — Application Architect at IBM, programming and robotics enthusiast.',
+        'Learn about Logicraft Studio, the free open-source multi-board embedded emulator, and its creator Chiru Deep — programming and robotics enthusiast.',
       url: `${DOMAIN}/about`,
     },
   },

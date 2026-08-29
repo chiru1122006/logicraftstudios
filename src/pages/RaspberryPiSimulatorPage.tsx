@@ -50,7 +50,7 @@ const JSON_LD: object[] = [
       'Free online Raspberry Pi 3 simulator with full ARM Cortex-A53 Linux emulation via QEMU. Run Python, bash, and RPi.GPIO in your browser — no Raspberry Pi hardware needed.',
     url: 'https://logicraftstudios.tech/raspberry-pi-simulator',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    author: { '@type': 'Person', name: 'David Montero Crespo' },
+    author: { '@type': 'Person', name: 'Chiru Deep' },
   },
   {
     '@context': 'https://schema.org',

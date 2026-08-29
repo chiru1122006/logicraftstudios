@@ -49,7 +49,7 @@ const JSON_LD: object[] = [
       'Free browser-based ATmega328P simulator. Full AVR8 emulation at 16 MHz — PORTB, PORTC, PORTD, Timer0/1/2, ADC, USART, PWM — with 48+ interactive components. No install required.',
     url: 'https://logicraftstudios.tech/atmega328p-simulator',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    author: { '@type': 'Person', name: 'David Montero Crespo' },
+    author: { '@type': 'Person', name: 'Chiru Deep' },
     license: 'https://www.gnu.org/licenses/agpl-3.0.html',
   },
   {

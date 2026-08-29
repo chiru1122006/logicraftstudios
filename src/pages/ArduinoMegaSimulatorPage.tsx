@@ -49,7 +49,7 @@ const JSON_LD: object[] = [
       'Free online Arduino Mega 2560 simulator. Emulate ATmega2560 with 256 KB flash, 54 digital pins, 16 analog inputs, and 4 serial ports — full AVR8 emulation in your browser.',
     url: 'https://logicraftstudios.tech/arduino-mega-simulator',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    author: { '@type': 'Person', name: 'David Montero Crespo' },
+    author: { '@type': 'Person', name: 'Chiru Deep' },
     license: 'https://www.gnu.org/licenses/agpl-3.0.html',
   },
   {

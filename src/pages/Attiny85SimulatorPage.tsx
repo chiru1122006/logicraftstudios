@@ -55,7 +55,7 @@ const JSON_LD: object[] = [
       'Free online ATtiny85 simulator with cycle-accurate AVR8 emulation. All 6 I/O pins, Timer0/Timer1 PWM, 10-bit ADC, USI for I²C/SPI, watchdog. Wire it to real SPICE analog circuits.',
     url: 'https://logicraftstudios.tech/attiny85-simulator',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    author: { '@type': 'Person', name: 'David Montero Crespo' },
+    author: { '@type': 'Person', name: 'Chiru Deep' },
     license: 'https://www.gnu.org/licenses/agpl-3.0.html',
   },
   {

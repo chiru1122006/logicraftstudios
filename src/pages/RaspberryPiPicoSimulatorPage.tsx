@@ -49,7 +49,7 @@ const JSON_LD: object[] = [
     description: META.description,
     url: META.url,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    author: { '@type': 'Person', name: 'David Montero Crespo' },
+    author: { '@type': 'Person', name: 'Chiru Deep' },
   },
   {
     '@context': 'https://schema.org',

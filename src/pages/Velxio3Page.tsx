@@ -114,7 +114,7 @@ const JSON_LD: object[] = [
       'Logicraft Studio 3.0 adds programmable retro CPUs (Z80, 8080, 4004, 4040, 8086), MicroSD card emulation, ePaper displays, true multi-board UART/I2C/SPI interconnect, full undo/redo, a full ngspice WASM migration, an 88% smaller bundle, and 100+ new gallery examples. Free and open-source.',
     url: 'https://logicraftstudios.tech/v3',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    author: { '@type': 'Person', name: 'David Montero Crespo' },
+    author: { '@type': 'Person', name: 'Chiru Deep' },
     license: 'https://www.gnu.org/licenses/agpl-3.0.html',
   },
   {

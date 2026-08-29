@@ -51,7 +51,7 @@ const JSON_LD: object[] = [
       'Free online electronics simulator. SPICE-accurate analog parts wired to 19 simulated microcontrollers. 100+ components, oscilloscope, voltmeter, ammeter — your virtual breadboard.',
     url: 'https://logicraftstudios.tech/electronics-simulator',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    author: { '@type': 'Person', name: 'David Montero Crespo' },
+    author: { '@type': 'Person', name: 'Chiru Deep' },
     license: 'https://www.gnu.org/licenses/agpl-3.0.html',
   },
   {

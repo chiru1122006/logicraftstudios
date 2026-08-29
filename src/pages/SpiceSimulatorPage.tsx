@@ -55,7 +55,7 @@ const JSON_LD: object[] = [
       'Free online SPICE simulator running ngspice in WebAssembly. Real device models, full Modified Nodal Analysis, live oscilloscope and meters. Co-simulates with Arduino, ESP32, RP2040, and ATtiny85 firmware.',
     url: 'https://logicraftstudios.tech/spice-simulator',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    author: { '@type': 'Person', name: 'David Montero Crespo' },
+    author: { '@type': 'Person', name: 'Chiru Deep' },
     license: 'https://www.gnu.org/licenses/agpl-3.0.html',
   },
   {
