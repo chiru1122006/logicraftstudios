@@ -93,22 +93,6 @@
   stroke: #f0c14b;
 }
 
-.v2-discord-btn {
-  background: #1c1c1e;
-  color: #7289da;
-  border-color: #333;
-}
-
-.v2-discord-btn:hover {
-  background: #2a2a2c;
-  border-color: #7289da;
-  transform: scale(1.03);
-}
-
-.v2-discord-btn svg {
-  fill: #7289da;
-}
-
 /* ── Architecture groups ─────────────────────────────── */
 .v2-arch-group {
   margin-bottom: 2rem;
