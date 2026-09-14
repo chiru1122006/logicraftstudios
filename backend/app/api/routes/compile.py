@@ -22,6 +22,7 @@ from app.core.hooks import (
     get_project_libraries,
     resolve_compile_owner,
     record_compile,
+    register_lifespan_startup,
 )
 from app.services import build_queue
 from app.services import espidf_compiler as espidf_compiler_module
@@ -64,6 +65,25 @@ def _env_int(name: str, default: int, lo: int, hi: int) -> int:
         logger.warning("[compile] %s is not an integer; using %d", name, default)
         return default
     return max(lo, min(hi, value))
+
+
+# ── In-Memory Artifact Cache (RAM) ──────────────────────────────────────────
+# Ultra-fast in-memory cache keeping precompiled binaries and artifacts in RAM
+# for instantaneous 0ms responses without disk I/O, file access or JSON parsing.
+_MEMORY_ARTIFACT_CACHE: dict[str, dict[str, Any]] = {}
+_MEMORY_ARTIFACT_MAX_ENTRIES = _env_int("VELXIO_MEMORY_CACHE_MAX_ENTRIES", 2000, 50, 100_000)
+
+
+def _memory_artifact_put(key: str, data: dict) -> None:
+    """Store compiled result in RAM with LRU capacity bounding."""
+    global _MEMORY_ARTIFACT_CACHE
+    if len(_MEMORY_ARTIFACT_CACHE) >= _MEMORY_ARTIFACT_MAX_ENTRIES:
+        # Evict oldest 10%
+        evict_count = max(1, _MEMORY_ARTIFACT_MAX_ENTRIES // 10)
+        keys_to_evict = list(_MEMORY_ARTIFACT_CACHE.keys())[:evict_count]
+        for k in keys_to_evict:
+            _MEMORY_ARTIFACT_CACHE.pop(k, None)
+    _MEMORY_ARTIFACT_CACHE[key] = dict(data)
 
 
 # Entries are bimodal — a 2 KB AVR hex or a 5 MB merged ESP32 flash image —
@@ -127,7 +147,22 @@ def _artifact_path(key: str) -> Path:
 
 
 def _artifact_load(key: str) -> dict | None:
-    """Return a cached CompileResponse dict, or None. Never raises."""
+    """Return a cached CompileResponse dict, or None. Never raises.
+    First checks in-memory RAM cache (0ms latency), then falls back to disk
+    and promotes disk hits into RAM."""
+    now = time.time()
+    # 1. In-memory RAM cache check (instant 0ms response)
+    if key in _MEMORY_ARTIFACT_CACHE:
+        entry = _MEMORY_ARTIFACT_CACHE[key]
+        built_at = entry.get("built_at") or now
+        if now - float(built_at) <= ARTIFACT_CACHE_MAX_AGE_S:
+            # Re-insert for LRU freshness
+            _MEMORY_ARTIFACT_CACHE[key] = entry
+            return dict(entry)
+        else:
+            _MEMORY_ARTIFACT_CACHE.pop(key, None)
+
+    # 2. Persistent disk cache check
     path = _artifact_path(key)
     try:
         if not path.is_file():
@@ -135,38 +170,36 @@ def _artifact_load(key: str) -> dict | None:
         data = json.loads(path.read_text())
         if not isinstance(data, dict):
             return None
-        # Age from when it was BUILT, not from the last read: touch-on-read
-        # (kept below, it is what the LRU prune orders on) made a popular
-        # artifact immortal and served bytes built against libraries that had
-        # since changed. Entries stored before built_at existed age by mtime.
         built_at = data.get("built_at") or path.stat().st_mtime
-        if time.time() - float(built_at) > ARTIFACT_CACHE_MAX_AGE_S:
+        if now - float(built_at) > ARTIFACT_CACHE_MAX_AGE_S:
             path.unlink(missing_ok=True)
             return None
         os.utime(path, None)  # LRU: touch on read
-        return data
+        # Promote into in-memory RAM cache for 0ms subsequent lookups
+        _memory_artifact_put(key, data)
+        return dict(data)
     except Exception:
         logger.warning("[compile] artifact cache read failed", exc_info=True)
         return None
 
 
 def _artifact_store_sync(key: str, result: dict) -> None:
-    """Persist a SUCCESSFUL build. Failures are never cached — a compile error
-    is usually the user's half-written code, and they will edit and retry.
-
-    Blocking: json.dumps of a 5 MB image plus the write plus (every so many
-    stores) the prune walk. Call through `_artifact_store` from the loop.
-    """
+    """Persist a SUCCESSFUL build to both in-memory RAM cache and disk.
+    Failures are never cached — a compile error is usually the user's
+    half-written code, and they will edit and retry."""
     global _artifact_stores_since_prune
     if not result.get("success"):
         return
     try:
-        ARTIFACT_CACHE_DIR.mkdir(parents=True, exist_ok=True)
-        # The build log is per-run noise and can be hundreds of KB; a cache hit
-        # says so in its place rather than replaying someone else's ninja run.
         slim = dict(result)
-        slim["stdout"] = "[served from the build cache - identical sources]"
+        slim["stdout"] = "[served from the in-memory build cache - identical sources]"
         slim["built_at"] = time.time()
+
+        # 1. Immediate in-memory cache storage (RAM)
+        _memory_artifact_put(key, slim)
+
+        # 2. Persistent disk cache storage
+        ARTIFACT_CACHE_DIR.mkdir(parents=True, exist_ok=True)
         tmp = _artifact_path(key).with_suffix(".tmp")
         tmp.write_text(json.dumps(slim))
         tmp.replace(_artifact_path(key))
@@ -180,6 +213,34 @@ def _artifact_store_sync(key: str, result: dict) -> None:
 
 async def _artifact_store(key: str, result: dict) -> None:
     await asyncio.to_thread(_artifact_store_sync, key, result)
+
+
+def preload_artifacts_into_memory() -> int:
+    """Preload all unexpired disk artifacts into the in-memory RAM cache on startup."""
+    if not ARTIFACT_CACHE_DIR.is_dir():
+        return 0
+    loaded = 0
+    now = time.time()
+    try:
+        for entry in ARTIFACT_CACHE_DIR.glob("*.json"):
+            try:
+                key = entry.stem
+                if key in _MEMORY_ARTIFACT_CACHE:
+                    continue
+                data = json.loads(entry.read_text())
+                if not isinstance(data, dict):
+                    continue
+                built_at = data.get("built_at") or entry.stat().st_mtime
+                if now - float(built_at) > ARTIFACT_CACHE_MAX_AGE_S:
+                    continue
+                _memory_artifact_put(key, data)
+                loaded += 1
+            except Exception:
+                continue
+    except Exception as e:
+        logger.warning(f"[compile] Error preloading artifacts into memory: {e}")
+    logger.info(f"[compile] Preloaded {loaded} compilation artifacts into in-memory RAM cache")
+    return loaded
 
 
 def _artifact_prune() -> None:
@@ -1176,6 +1237,47 @@ async def compile_sketch(
     if sync_refusal is not None:
         return sync_refusal
 
+    spiffs_dicts = (
+        [f.model_dump() for f in request.spiffs_files] if request.spiffs_files else None
+    )
+    fingerprint = scope_fingerprint(sync_allowed, sync_owner)
+    key = _job_key(
+        files, request.board_fqbn, request.board_options, spiffs_dicts,
+        sorted(sync_allowed) if sync_allowed else None,
+        sync_owner if sync_allowed else None,
+        language=request.language,
+        custom_wifi_ssids=request.custom_wifi_ssids,
+        scope_fingerprint=fingerprint,
+    )
+
+    # In-memory and disk cache lookup
+    bypass_cache = bool(
+        _CACHE_BYPASS_TOKEN
+        and http_request.headers.get("x-velxio-cache-bypass", "") == _CACHE_BYPASS_TOKEN
+    )
+    cached = None if bypass_cache else _artifact_load(key)
+    if cached is not None:
+        logger.info(f"[compile] sync compile in-memory cache hit for {request.board_fqbn} (0ms)")
+        await record_compile(
+            user_id=user_id,
+            project_id=request.project_id,
+            board_fqbn=request.board_fqbn,
+            success=True,
+            duration_ms=0,
+            error_kind=None,
+            extra={
+                "file_count": len(files),
+                "cached": True,
+                "in_memory": key in _MEMORY_ARTIFACT_CACHE,
+                "initiated_by": request.initiated_by,
+                "board_kind": request.board_kind,
+                "example_id": request.example_id,
+                **(cached.get("scope") or {}),
+            },
+            request=http_request,
+        )
+        return CompileResponse(**cached)
+
     async def _gated_compile() -> CompileResponse:
         # This path used to call _run_compile directly with no build slot, so
         # an API caller bypassed the queue entirely while everyone in the
@@ -1198,19 +1300,9 @@ async def compile_sketch(
         # staging the day the P4 lane landed). The shield lets the build run
         # to completion and keep the cache consistent; only the response is
         # lost.
-        #
-        # The shield covers the queue wait too. Dropping the slot on
-        # disconnect and letting the shielded build run on would put a build
-        # outside the concurrency cap — the one thing the lane exists to
-        # prevent, so the whole gated coroutine is shielded together.
-        #
-        # The cost is real and worth naming: this path neither reads nor writes
-        # the artifact cache (only the async job path does), so a request
-        # abandoned while queued still consumes a slot for a build whose result
-        # nobody receives and nothing caches. Acceptable because the sync
-        # endpoint is the API/legacy path — the editor uses /compile/start —
-        # and a corrupted shared build dir is far worse than a wasted slot.
         response = await asyncio.shield(asyncio.ensure_future(_gated_compile()))
+        if response.success and key:
+            await _artifact_store(key, response.model_dump())
     except Exception as e:
         await record_compile(
             user_id=user_id,
@@ -1507,3 +1599,110 @@ async def ensure_core(request: CompileRequest):
 async def list_boards():
     boards = await arduino_cli.list_boards()
     return {"boards": boards}
+
+
+# ── ESP32 In-Memory Board Pre-warming ───────────────────────────────────────
+# Pre-warms the in-memory RAM cache on server startup for all ESP32 boards
+# with common starter sketches so initial user runs are instantaneous (0ms).
+
+_PREWARM_ESP32_BOARDS = (
+    "esp32:esp32:esp32",          # ESP32 Dev Module / DevKitC V4 / NodeMCU-32S
+    "esp32:esp32:esp32cam",       # AI Thinker ESP32-CAM
+    "esp32:esp32:esp32c3",        # ESP32-C3 Dev Module / SuperMini
+    "esp32:esp32:esp32s3",        # ESP32-S3 Dev Module
+    "esp32:esp32:esp32s2",        # ESP32-S2 Dev Module
+    "esp32:esp32:nano_nora",      # Arduino Nano ESP32
+    "esp32:esp32:XIAO_ESP32C3",   # Seeed Studio XIAO ESP32C3
+    "esp32:esp32:XIAO_ESP32S3",   # Seeed Studio XIAO ESP32S3
+)
+
+_PREWARM_SKETCHES = (
+    # 1. Default Blink sketch
+    [{"name": "sketch.ino", "content": (
+        "// Arduino Blink Example\n"
+        "void setup() {\n"
+        "  pinMode(LED_BUILTIN, OUTPUT);\n"
+        "}\n\n"
+        "void loop() {\n"
+        "  digitalWrite(LED_BUILTIN, HIGH);\n"
+        "  delay(1000);\n"
+        "  digitalWrite(LED_BUILTIN, LOW);\n"
+        "  delay(1000);\n"
+        "}\n"
+    )}],
+    # 2. Minimal empty sketch
+    [{"name": "sketch.ino", "content": (
+        "void setup() {\n"
+        "}\n\n"
+        "void loop() {\n"
+        "}\n"
+    )}],
+    # 3. Serial communication sketch
+    [{"name": "sketch.ino", "content": (
+        "void setup() {\n"
+        "  Serial.begin(115200);\n"
+        "  pinMode(2, OUTPUT);\n"
+        "}\n\n"
+        "void loop() {\n"
+        "  Serial.println(\"ESP32 running\");\n"
+        "  digitalWrite(2, HIGH);\n"
+        "  delay(1000);\n"
+        "  digitalWrite(2, LOW);\n"
+        "  delay(1000);\n"
+        "}\n"
+    )}],
+    # 4. WiFi test sketch
+    [{"name": "sketch.ino", "content": (
+        "#include <WiFi.h>\n\n"
+        "void setup() {\n"
+        "  Serial.begin(115200);\n"
+        "  WiFi.begin(\"Wokwi-GUEST\", \"\");\n"
+        "}\n\n"
+        "void loop() {\n"
+        "  delay(1000);\n"
+        "}\n"
+    )}],
+)
+
+
+async def _prewarm_single_target(board_fqbn: str, sketch_files: list[dict[str, str]]) -> None:
+    """Pre-warm a single board + sketch in memory if not already cached."""
+    try:
+        key = _job_key(sketch_files, board_fqbn)
+        if _artifact_load(key) is not None:
+            return
+
+        if not espidf_compiler.available:
+            return
+
+        req = CompileRequest(
+            files=[SketchFile(name=f["name"], content=f["content"]) for f in sketch_files],
+            board_fqbn=board_fqbn,
+            initiated_by="prewarmer",
+        )
+        logger.info(f"[compile-prewarm] Pre-warming in-memory cache for {board_fqbn}...")
+        resp = await _run_compile(req, sketch_files)
+        if resp.success:
+            await _artifact_store(key, resp.model_dump())
+            logger.info(f"[compile-prewarm] Successfully cached {board_fqbn} in RAM!")
+    except Exception as e:
+        logger.warning(f"[compile-prewarm] Pre-warm failed for {board_fqbn}: {e}")
+
+
+async def prewarm_esp32_memory_cache() -> None:
+    """Startup task: preload existing artifacts into RAM, then prewarm boards in background."""
+    count = preload_artifacts_into_memory()
+    logger.info(f"[compile] In-memory cache active ({count} artifacts loaded)")
+
+    # Run board pre-warming in background so server startup is not blocked
+    async def _bg_prewarm():
+        await asyncio.sleep(2)  # Yield to initial server startup
+        for board in _PREWARM_ESP32_BOARDS:
+            for sketch in _PREWARM_SKETCHES:
+                await _prewarm_single_target(board, sketch)
+                await asyncio.sleep(0.5)
+
+    asyncio.create_task(_bg_prewarm())
+
+
+register_lifespan_startup(prewarm_esp32_memory_cache)

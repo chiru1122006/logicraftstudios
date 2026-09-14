@@ -312,7 +312,7 @@ def _run_with_streaming(
 # capped at 8 GB, permanently full (99.97%, 153 evictions, 47% hit rate).
 # Fewer trees, a bigger shared cache: a variant that gets evicted rebuilds
 # quickly FROM ccache, but a ccache miss recompiles from source.
-_MAX_BUILD_VARIANTS = 6
+_MAX_BUILD_VARIANTS = 24
 
 
 def _max_build_variants(idf_target: str) -> int:
@@ -324,7 +324,7 @@ def _max_build_variants(idf_target: str) -> int:
         raw = os.environ.get(name, '').strip()
         if raw:
             try:
-                return max(1, min(64, int(raw)))
+                return max(1, min(128, int(raw)))
             except ValueError:
                 logger.warning(f'[espidf] {name}={raw!r} is not an integer; ignored')
     return _MAX_BUILD_VARIANTS
