@@ -94,6 +94,7 @@ def _resolve_lib(env_var: str, lib_names: list[str], default_path: str) -> str:
         _SERVICES_DIR / 'qemu_lib',
         _SERVICES_DIR,
         pathlib.Path('/app/lib'),
+        pathlib.Path('/app/data'),
         _SERVICES_DIR.parent.parent / 'lib',
     ]
 
