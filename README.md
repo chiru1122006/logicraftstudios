@@ -48,41 +48,6 @@ instead of 5-30 seconds.
 
 ---
 
-## Screenshots
-
-<p align="center"><img src="docs/img/screens/weather-station.gif" width="520" alt="ESP32 weather station driving an ILI9341 TFT"></p>
-
-ESP32 weather station — a BMP280 over I2C, a DHT22 on a GPIO and an ILI9341 TFT over SPI wired on the canvas, three buses working at once while the display updates live.
-
-![ESP32 Blink running with the Serial Monitor open](docs/img/screens/editor-esp32-blink.png)
-
-The editor: Monaco on the left, the circuit canvas on the right, compiler output and Serial Monitor at the bottom. Here an ESP32 DevKit blinks an external LED and prints over UART.
-
-![Component picker with boards and modules](docs/img/screens/component-picker.png)
-
-Component picker — every board and module with a live preview, search and category filters. The catalog is over 150 parts: displays, sensors, motors, logic ICs, analog parts, breadboards and branded modules.
-
-![Examples gallery](docs/img/screens/examples-gallery.png)
-
-Examples gallery — more than 400 ready-to-run projects filtered by board, difficulty and topic, including the [100 Days 100 IoT Projects](https://github.com/logicraftstudios/100_Days_100_IoT_Projects) collection.
-
-![MicroPython on ESP32 with the REPL](docs/img/screens/micropython.png)
-
-MicroPython — the same ESP32, now running `main.py`, with the REPL in the terminal panel. ESP32 boards also accept pure ESP-IDF projects.
-
-![ESP32 WiFi with MQTT publish/subscribe](docs/img/screens/esp32-wifi-mqtt.png)
-
-Emulated WiFi — the ESP32 joins the virtual access point, gets an IP and round-trips messages through a public MQTT broker.
-
-![Oscilloscope tracing a GPIO](docs/img/screens/oscilloscope.png)
-
-Instruments — oscilloscope channels on any pin, plus a SPICE-based electrical layer that shows currents, voltages and shorts on the wires you draw.
-
-![Custom chip editor](docs/img/screens/custom-chip.png)
-
-Custom chips — write your own IC in C, compile it to WebAssembly and drop it on the canvas next to the boards.
-
----
 
 ## Supported Boards
 
