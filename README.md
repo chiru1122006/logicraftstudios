@@ -1,51 +1,22 @@
-# logicraftstudios: Arduino & Embedded Board Emulator
+<p align="center">
+  <img src="frontend/public/logicraft_logo.png" alt="Logicraft Studios Logo" width="220" />
+</p>
+
+# Logicraft Studios: Arduino, Embedded & RISC-V Board Emulator
 
 **Live at [logicraftstudios.tech](https://logicraftstudios.tech)**
 
 An open-source multi-board emulator and circuit simulator. Write Arduino C++, MicroPython, ESP-IDF or Python, compile it, and run it against real CPU emulation with 150+ interactive electronic components — all in your browser.
 
-**40 boards &middot; 5 CPU families**: AVR8 (ATmega / ATtiny), ARM Cortex-M (RP2040 / RP2350 / STM32), Xtensa LX6/LX7 (ESP32 / ESP32-S3), RISC-V (ESP32-C3 / ESP32-C6) and ARM Cortex-A Linux (Raspberry Pi Zero to 5).
+**41 boards &middot; 6 CPU families**: Vega RISC-V (ARIES v3.0 / THEVA SoC), AVR8 (ATmega / ATtiny), ARM Cortex-M (RP2040 / RP2350 / STM32), Xtensa LX6/LX7 (ESP32 / ESP32-S3), RISC-V (ESP32-C3 / ESP32-C6) and ARM Cortex-A Linux (Raspberry Pi Zero to 5).
 
-![Visitors](https://visitor-badge.laobi.icu/badge?page_id=chiru1122006/velxio)
+![Visitors](https://visitor-badge.laobi.icu/badge?page_id=chiru1122006/logicraftstudios)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-logicraftstudios.tech-007acc?style=for-the-badge)](https://logicraftstudios.tech)
-[![Docker Image](https://img.shields.io/badge/Docker-ghcr.io%2Fchiru1122006%2Fvelxio-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://github.com/chiru1122006/velxio/pkgs/container/velxio)
-[![GitHub stars](https://img.shields.io/github/stars/chiru1122006/velxio?style=for-the-badge)](https://github.com/chiru1122006/velxio/stargazers)
+[![Docker Image](https://img.shields.io/badge/Docker-ghcr.io%2Fchiru1122006%2Flogicraftstudios-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://github.com/chiru1122006/logicraftstudios/pkgs/container/logicraftstudios)
+[![GitHub stars](https://img.shields.io/github/stars/chiru1122006/logicraftstudios?style=for-the-badge)](https://github.com/chiru1122006/logicraftstudios/stargazers)
 [![Discord](https://img.shields.io/badge/Discord-Join%20Community-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/3mARjJrh4E)
 [![License: AGPLv3](https://img.shields.io/badge/License-AGPL%20v3-blue?style=for-the-badge)](LICENSE)
 [![Commercial License](https://img.shields.io/badge/Commercial%20License-Available-green?style=for-the-badge)](COMMERCIAL_LICENSE.md)
-
----
-
-[![Product Hunt](https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1092514&theme=dark&t=1772998619179)](https://www.producthunt.com/products/velxio)
-
----
-
-## Support the Project
-
-Velxio is free and open-source. Building and maintaining a full multi-board emulator takes a lot of time — if it saves you time or you enjoy the project, sponsoring me directly helps keep development going.
-
-| Platform | Link |
-| --- | --- |
-| **GitHub Sponsors** (preferred) | [github.com/sponsors/chiru1122006](https://github.com/sponsors/chiru1122006) |
-| **PayPal** | [paypal.me/odoonext](https://paypal.me/odoonext) |
-
-Your support helps cover server costs, library maintenance, and frees up time to add new boards, components, and features. Thank you!
-
----
-
-## Hardware Partners
-
-These companies have supported Velxio and provided their hardware so their components can be emulated accurately:
-
-<p align="center">
-  <a href="https://www.dfrobot.com/"><img src="docs/partners/dfrobot.png" alt="DFRobot" width="150"></a>&nbsp;
-  <a href="https://www.espressif.com/"><img src="docs/partners/espressif.png" alt="Espressif" width="150"></a>&nbsp;
-  <a href="https://m5stack.com/"><img src="docs/partners/m5stack.png" alt="M5Stack" width="150"></a>&nbsp;
-  <a href="https://www.seeedstudio.com/"><img src="docs/partners/seeed-studio.png" alt="Seeed Studio" width="150"></a>&nbsp;
-  <a href="https://pimoroni.com/"><img src="docs/partners/pimoroni.png" alt="Pimoroni" width="150"></a>
-</p>
-
-Their hardware is in the catalog today: the M5Stack Cardputer and Core, the Pimoroni Badger 2350 and Galactic Unicorn, the Seeed Studio XIAO family and Grove modules, the DFRobot UNIHIKER and Gravity sensors, and the whole Espressif ESP32 line up to the ESP32-C6.
 
 ---
 
@@ -57,18 +28,18 @@ To self-host with Docker (single command):
 
 ```bash
 docker run -d \
-  --name velxio \
+  --name logicraftstudios \
   -p 3080:80 \
-  -v velxio-data:/app/data \
-  -v velxio-arduino-libs:/root/.arduino15 \
-  -v velxio-arduino-user-libs:/root/Arduino \
-  -v velxio-ccache:/var/cache/ccache \
-  -v velxio-build:/var/lib/velxio-build \
-  ghcr.io/chiru1122006/velxio:master
+  -v logicraftstudios-data:/app/data \
+  -v logicraftstudios-arduino-libs:/root/.arduino15 \
+  -v logicraftstudios-arduino-user-libs:/root/Arduino \
+  -v logicraftstudios-ccache:/var/cache/ccache \
+  -v logicraftstudios-build:/var/lib/logicraftstudios-build \
+  ghcr.io/chiru1122006/logicraftstudios:master
 ```
 
 Then open <http://localhost:3080>. Tail logs any time with
-`docker logs -f velxio`.
+`docker logs -f logicraftstudios`.
 
 The named volumes are what make compile times reasonable on subsequent
 runs — without them, every container restart wipes the ESP-IDF build
@@ -93,7 +64,7 @@ Component picker — every board and module with a live preview, search and cate
 
 ![Examples gallery](docs/img/screens/examples-gallery.png)
 
-Examples gallery — more than 400 ready-to-run projects filtered by board, difficulty and topic, including the [100 Days 100 IoT Projects](https://github.com/velxio/100_Days_100_IoT_Projects) collection.
+Examples gallery — more than 400 ready-to-run projects filtered by board, difficulty and topic, including the [100 Days 100 IoT Projects](https://github.com/logicraftstudios/100_Days_100_IoT_Projects) collection.
 
 ![MicroPython on ESP32 with the REPL](docs/img/screens/micropython.png)
 
@@ -117,53 +88,57 @@ Custom chips — write your own IC in C, compile it to WebAssembly and drop it o
 
 <table>
 <tr>
+  <td align="center"><img src="docs/img/boards/aries-v3.png" width="120" alt="ARIES v3.0"/><br/><b>ARIES v3.0</b></td>
   <td align="center"><img src="docs/img/boards/arduino-uno.png" width="120" alt="Arduino Uno"/><br/><b>Arduino Uno</b></td>
   <td align="center"><img src="docs/img/boards/arduino-nano.png" width="120" alt="Arduino Nano"/><br/><b>Arduino Nano</b></td>
   <td align="center"><img src="docs/img/boards/arduino-mega.png" width="120" alt="Arduino Mega 2560"/><br/><b>Arduino Mega 2560</b></td>
   <td align="center"><img src="docs/img/boards/attiny85.png" width="120" alt="ATtiny85"/><br/><b>ATtiny85</b></td>
   <td align="center"><img src="docs/img/boards/raspberry-pi-3.png" width="120" alt="Raspberry Pi 3"/><br/><b>Raspberry Pi 3</b></td>
-  <td align="center"><img src="docs/img/boards/raspberry-pi-5.png" width="120" alt="Raspberry Pi 5"/><br/><b>Raspberry Pi 5</b></td>
 </tr>
 <tr>
+  <td align="center"><img src="docs/img/boards/raspberry-pi-5.png" width="120" alt="Raspberry Pi 5"/><br/><b>Raspberry Pi 5</b></td>
   <td align="center"><img src="docs/img/boards/raspberry-pi-pico.png" width="70" alt="Raspberry Pi Pico"/><br/><b>Raspberry Pi Pico</b></td>
   <td align="center"><img src="docs/img/boards/pi-pico-w.png" width="70" alt="Raspberry Pi Pico W"/><br/><b>Raspberry Pi Pico W</b></td>
   <td align="center"><img src="docs/img/boards/esp32.png" width="80" alt="ESP32 DevKit V1"/><br/><b>ESP32 DevKit V1</b></td>
   <td align="center"><img src="docs/img/boards/esp32-s3.png" width="70" alt="ESP32-S3"/><br/><b>ESP32-S3</b></td>
   <td align="center"><img src="docs/img/boards/esp32-c3.png" width="80" alt="ESP32-C3"/><br/><b>ESP32-C3</b></td>
-  <td align="center"><img src="docs/img/boards/esp32-cam.png" width="80" alt="ESP32-CAM"/><br/><b>ESP32-CAM</b></td>
 </tr>
 <tr>
+  <td align="center"><img src="docs/img/boards/esp32-cam.png" width="80" alt="ESP32-CAM"/><br/><b>ESP32-CAM</b></td>
   <td align="center"><img src="docs/img/boards/xiao-esp32-s3.png" width="90" alt="XIAO ESP32-S3"/><br/><b>XIAO ESP32-S3</b></td>
   <td align="center"><img src="docs/img/boards/xiao-esp32-c3.png" width="90" alt="XIAO ESP32-C3"/><br/><b>XIAO ESP32-C3</b></td>
   <td align="center"><img src="docs/img/boards/arduino-nano-esp32.png" width="120" alt="Arduino Nano ESP32"/><br/><b>Arduino Nano ESP32</b></td>
   <td align="center"><img src="docs/img/boards/stm32-bluepill.png" width="70" alt="STM32 Blue Pill"/><br/><b>STM32 Blue Pill</b></td>
   <td align="center"><img src="docs/img/boards/stm32-blackpill.png" width="70" alt="STM32 Black Pill"/><br/><b>STM32 Black Pill</b></td>
-  <td align="center"><img src="docs/img/boards/stm32-f4-discovery.png" width="90" alt="STM32F4 Discovery"/><br/><b>STM32F4 Discovery</b></td>
 </tr>
 <tr>
+  <td align="center"><img src="docs/img/boards/stm32-f4-discovery.png" width="90" alt="STM32F4 Discovery"/><br/><b>STM32F4 Discovery</b></td>
   <td align="center"><img src="docs/img/boards/cardputer-adv.png" width="120" alt="M5 Cardputer ADV"/><br/><b>M5 Cardputer ADV</b></td>
   <td align="center"><img src="docs/img/boards/m5stack-core.png" width="110" alt="M5Stack Core"/><br/><b>M5Stack Core</b></td>
   <td align="center"><img src="docs/img/boards/badger-2350.png" width="120" alt="Pimoroni Badger 2350"/><br/><b>Pimoroni Badger 2350</b></td>
   <td align="center"><img src="docs/img/boards/xiao-esp32s3-sense.png" width="90" alt="XIAO ESP32S3 Sense"/><br/><b>XIAO ESP32S3 Sense</b></td>
   <td align="center"><img src="docs/img/boards/esp32-c6.png" width="70" alt="ESP32-C6 DevKit"/><br/><b>ESP32-C6 DevKit</b></td>
+</tr>
+<tr>
   <td align="center"><img src="docs/img/boards/unihiker-m10.png" width="90" alt="DFRobot UNIHIKER M10"/><br/><b>DFRobot UNIHIKER M10</b></td>
 </tr>
 </table>
 
-Boards run in one of two places. **Browser boards** (AVR, RP2040) are emulated entirely in the page with avr8js and rp2040js — nothing leaves your machine. **Server boards** (ESP32 family, STM32, Raspberry Pi Linux) boot a real QEMU machine on the backend and stream GPIO and serial to the canvas. Both feel the same: press Play.
+Boards run in one of two places. **Browser boards** (ARIES v3.0, AVR, RP2040) are emulated directly in the page with WebAssembly and JavaScript engines — nothing leaves your machine. **Server boards** (ESP32 family, STM32, Raspberry Pi Linux) boot a real QEMU machine on the backend and stream GPIO and serial to the canvas. Both feel the same: press Play.
 
 | Family | Boards | Languages | Where it runs |
 | --- | --- | --- | --- |
+| **Vega / RISC-V (India)** | **ARIES v3.0** (THEVA SoC RISC-V 32-bit core) | Embedded C / Arduino C++ | Browser — self-hosted and logicraftstudios.tech |
 | **Arduino / AVR** | Uno, Nano, Mega 2560, ATtiny85 | Arduino C++ | Browser — self-hosted and logicraftstudios.tech |
 | **Raspberry Pi Pico** | Pico, Pico W | Arduino C++, MicroPython | Browser — self-hosted and logicraftstudios.tech |
 | **ESP32** | ESP32 DevKit V1, DevKit-C V4, ESP32-CAM, Wemos Lolin32 Lite | Arduino C++, MicroPython, ESP-IDF | Self-hosted (QEMU) and logicraftstudios.tech |
 | **ESP32-S3** | ESP32-S3 DevKit, XIAO ESP32-S3, Arduino Nano ESP32 | Arduino C++, MicroPython, ESP-IDF | Self-hosted (QEMU) and logicraftstudios.tech |
 | **ESP32-C3** | ESP32-C3 DevKit, XIAO ESP32-C3, ESP32-C3 SuperMini | Arduino C++, MicroPython, ESP-IDF | Self-hosted (QEMU) and logicraftstudios.tech |
-| **STM32** | Blue Pill (F103C8 / F103CB), Black Pill (F411CE / F401CE), STM32F4 Discovery, Olimex STM32-H405, Netduino 2 / Plus 2 | Arduino C++ | logicraftstudios.tech (paid plan) or Velxio Desktop |
-| **Raspberry Pi (Linux)** | Zero, 1B+, 2B, 3B, 4B, 5 — boot a real Linux and run Python in a full terminal | Python | logicraftstudios.tech (paid plan) or Velxio Desktop |
-| **Branded boards** | M5Stack Cardputer ADV and Core, Pimoroni Badger 2350, Galactic Unicorn and Pico Plus 2 W, Seeed XIAO ESP32S3 Sense, XIAO ESP32C6 and XIAO RP2040, Espressif ESP32-C6 DevKit, DFRobot UNIHIKER M10 | Arduino C++, MicroPython, ESP-IDF | logicraftstudios.tech only (free plan; UNIHIKER needs a paid plan) |
+| **STM32** | Blue Pill (F103C8 / F103CB), Black Pill (F411CE / F401CE), STM32F4 Discovery, Olimex STM32-H405, Netduino 2 / Plus 2 | Arduino C++ | logicraftstudios.tech or Logicraft Studios Desktop |
+| **Raspberry Pi (Linux)** | Zero, 1B+, 2B, 3B, 4B, 5 — boot a real Linux and run Python in a full terminal | Python | logicraftstudios.tech or Logicraft Studios Desktop |
+| **Branded boards** | M5Stack Cardputer ADV and Core, Pimoroni Badger 2350, Galactic Unicorn and Pico Plus 2 W, Seeed XIAO ESP32S3 Sense, XIAO ESP32C6 and XIAO RP2040, Espressif ESP32-C6 DevKit, DFRobot UNIHIKER M10 | Arduino C++, MicroPython, ESP-IDF | logicraftstudios.tech |
 
-The self-hosted image runs the first five families out of the box. STM32 and Raspberry Pi Linux are hosted features (their emulators need licensed binaries and multi-GB boot images). The branded boards boot their factory firmware (the M5 launcher, BadgeOS) and live in the hosted catalog only; the OSS picker shows them as links to the online editor. The full list with pinouts, languages and quirks is in the [boards reference](https://logicraftstudios.tech/docs/boards/overview/).
+The self-hosted image runs the primary families out of the box. STM32 and Raspberry Pi Linux are supported through local QEMU or cloud engines. The branded boards boot their factory firmware (the M5 launcher, BadgeOS) and live in the hosted catalog; the OSS picker provides full accessibility to the online editor. The full list with pinouts, languages and quirks is in the [boards reference](https://logicraftstudios.tech/docs/boards/overview/).
 
 ---
 
@@ -178,6 +153,13 @@ The self-hosted image runs the first five families out of the box. STM32 and Ras
 - **Compilation console** — resizable output panel showing full compiler output, warnings, and errors
 
 ### Multi-Board Simulation
+
+#### Vega RISC-V (ARIES v3.0)
+
+- **C-DAC THEVA SoC RISC-V 32-bit core emulation** directly in browser canvas
+- **Rich I/O & Peripheral mapping**: GPIO, UART serial, SPI, I2C, and PWM
+- **Interactive Board Canvas**: High-fidelity board SVG with pin tooltips, status LEDs, and wire routing
+- **Live C / Arduino sketch execution** with Serial Monitor integration
 
 #### AVR8 (Arduino Uno / Nano / Mega / ATtiny85)
 
@@ -213,7 +195,7 @@ The ESP32 family (Xtensa and RISC-V), the STM32 family and the Raspberry Pi Linu
 ### Example Projects
 
 - Hundreds of ready-to-run examples in the gallery (400+ on logicraftstudios.tech), filtered by board, difficulty and topic — from Blink and Traffic Light to TFT dashboards, e-paper displays, MQTT over emulated WiFi and Pi + Arduino serial links
-- The [100 Days 100 IoT Projects](https://github.com/velxio/100_Days_100_IoT_Projects) collection, imported as runnable projects
+- The [100 Days 100 IoT Projects](https://github.com/logicraftstudios/100_Days_100_IoT_Projects) collection, imported as runnable projects
 - One-click loading into the editor
 
 ---
@@ -226,16 +208,16 @@ automatically.
 
 | Path | Boards available | Build time | Best for |
 | --- | --- | --- | --- |
-| **A. Docker (prebuilt image)** | AVR, RP2040 and the whole **ESP32** family (Xtensa + RISC-V) | ~30 s download | Just want it running |
+| **A. Docker (prebuilt image)** | ARIES v3.0, AVR, RP2040 and the whole **ESP32** family (Xtensa + RISC-V) | ~30 s download | Just want it running |
 | **B. Docker Compose (build from source)** | Same as A | ~10–15 min first build | Want to modify the code |
-| **C. Manual install** | Browser-only boards (AVR, RP2040) | ~5 min | Frontend / backend dev |
+| **C. Manual install** | Browser-only boards (ARIES v3.0, AVR, RP2040) | ~5 min | Frontend / backend dev |
 
 > ESP32 emulation relies on QEMU `.so` libraries that ship inside the
 > Docker image. Manual installs get the browser-side boards out of the
 > box — **for ESP32 you'll want Docker** (or follow
 > [docs/ESP32_EMULATION.md](docs/ESP32_EMULATION.md) to wire up the QEMU
 > binaries by hand). STM32 and Raspberry Pi Linux emulation are hosted
-> features — use them on logicraftstudios.tech or in Velxio Desktop.
+> features — use them on logicraftstudios.tech or in Logicraft Studios Desktop.
 
 ---
 
@@ -243,31 +225,31 @@ automatically.
 
 ```bash
 docker run -d \
-  --name velxio \
+  --name logicraftstudios \
   -p 3080:80 \
-  -v velxio-data:/app/data \
-  -v velxio-arduino-libs:/root/.arduino15 \
-  -v velxio-arduino-user-libs:/root/Arduino \
-  -v velxio-ccache:/var/cache/ccache \
-  -v velxio-build:/var/lib/velxio-build \
-  ghcr.io/chiru1122006/velxio:master
+  -v logicraftstudios-data:/app/data \
+  -v logicraftstudios-arduino-libs:/root/.arduino15 \
+  -v logicraftstudios-arduino-user-libs:/root/Arduino \
+  -v logicraftstudios-ccache:/var/cache/ccache \
+  -v logicraftstudios-build:/var/lib/logicraftstudios-build \
+  ghcr.io/chiru1122006/logicraftstudios:master
 ```
 
 Open <http://localhost:3080>.
 
 The five named volumes persist:
 
-- `velxio-data` → `/app/data`: SQLite DB, project sketch files, auto-generated `SECRET_KEY`
-- `velxio-arduino-libs` → `/root/.arduino15`: arduino-cli config + installed
+- `logicraftstudios-data` → `/app/data`: SQLite DB, project sketch files, auto-generated `SECRET_KEY`
+- `logicraftstudios-arduino-libs` → `/root/.arduino15`: arduino-cli config + installed
   cores (saves a 5–10 min reinstall on every container restart)
-- `velxio-arduino-user-libs` → `/root/Arduino`: Library Manager-installed
+- `logicraftstudios-arduino-user-libs` → `/root/Arduino`: Library Manager-installed
   Arduino libraries (e.g. Adafruit_BMP280, DHT, GFX). Without this,
   every container restart re-downloads them on next compile.
-- `velxio-ccache` → `/var/cache/ccache`: ccache C/C++ object cache for
+- `logicraftstudios-ccache` → `/var/cache/ccache`: ccache C/C++ object cache for
   ESP-IDF compiles. Empty on first compile, populated as you go;
   subsequent compiles hit the cache and finish in seconds instead of
   minutes.
-- `velxio-build` → `/var/lib/velxio-build`: persistent ESP-IDF build dir
+- `logicraftstudios-build` → `/var/lib/logicraftstudios-build`: persistent ESP-IDF build dir
   (one subdir per target — esp32, esp32c3, esp32s3). Lets ninja's
   incremental build skip everything that hasn't changed; a re-compile
   of an unchanged sketch finishes in 2-5 seconds.
@@ -282,8 +264,8 @@ ones). Only `docker rm -v` or `docker volume prune` would wipe them.
 ### Option B: Docker Compose (build from source)
 
 ```bash
-git clone https://github.com/chiru1122006/velxio.git
-cd velxio
+git clone https://github.com/chiru1122006/logicraftstudios.git
+cd logicraftstudios
 docker compose up -d --build
 ```
 
@@ -303,14 +285,14 @@ change the CORS origin used during local development.
 | Variable | Default | Description |
 | --- | --- | --- |
 | `FRONTEND_URL` | `http://localhost:5173` | Origin allowed by CORS for local Vite dev |
-| `VELXIO_NEWS` | `on` | Product news: the backend fetches release notes and product news from logicraftstudios.tech's public feed (cached ~6h, anonymous, no identifiers sent) and the editor shows each item once as a "What's New" modal. Posts may embed remote media (screenshots, GIFs, YouTube previews) which the viewer's browser loads directly from the hosting site; video players only load after an explicit click. Set to `off` to disable entirely; an offline host degrades to no news automatically. |
+| `LOGICRAFT_NEWS` | `on` | Product news: the backend fetches release notes and product news from logicraftstudios.tech's public feed (cached ~6h, anonymous, no identifiers sent) and the editor shows each item once as a "What's New" modal. Posts may embed remote media (screenshots, GIFs, YouTube previews) which the viewer's browser loads directly from the hosting site; video players only load after an explicit click. Set to `off` to disable entirely; an offline host degrades to no news automatically. |
 
 > **Deploying behind a reverse proxy?** The container listens on plain HTTP
 > on port 80 and accepts any `Host` header — no `server_name` whitelist.
 
 > **Running logicraftstudios.tech itself?** Production-only configuration (host nginx
 > + HTTPS, backups, pinned upstream commit) lives in its own repo:
-> [github.com/velxio/velxio-prod](https://github.com/velxio/velxio-prod).
+> [github.com/chiru1122006/logicraftstudios-prod](https://github.com/chiru1122006/logicraftstudios-prod).
 
 ---
 
@@ -319,8 +301,8 @@ change the CORS origin used during local development.
 **Prerequisites:** Node.js 18+, Python 3.12+, arduino-cli
 
 ```bash
-git clone https://github.com/chiru1122006/velxio.git
-cd velxio
+git clone https://github.com/chiru1122006/logicraftstudios.git
+cd logicraftstudios
 ```
 
 > No `--recurse-submodules` needed. `@wokwi/elements`, `avr8js` and
@@ -374,7 +356,7 @@ arduino-cli core install ATTinyCore:avr
 
 ## Documentation
 
-The user documentation lives at **[logicraftstudios.tech/docs](https://logicraftstudios.tech/docs/)** — getting started, every board and part, the circuit editor, programming in Arduino / MicroPython / ESP-IDF, WiFi and IoT, instruments, custom chips and the AI assistant, in 9 languages. Its source is the public [velxio/velxio_docs](https://github.com/velxio/velxio_docs) repository; corrections and new pages are welcome there.
+The user documentation lives at **[logicraftstudios.tech/docs](https://logicraftstudios.tech/docs/)** — getting started, every board and part, the circuit editor, programming in Arduino / MicroPython / ESP-IDF, WiFi and IoT, instruments, custom chips and the AI assistant, in 9 languages. Its source is the public [logicraftstudios/logicraftstudios_docs](https://github.com/logicraftstudios/logicraftstudios_docs) repository; corrections and new pages are welcome there.
 
 The `docs/` folder of this repository keeps the technical notes for contributors (emulator internals, QEMU bridges, MCP server, roadmap).
 
@@ -388,15 +370,15 @@ Join the Discord server to ask questions, share projects, and follow updates:
 
 ## Contributing
 
-Suggestions, bug reports, and pull requests are welcome at [github.com/chiru1122006/velxio](https://github.com/chiru1122006/velxio).
+Suggestions, bug reports, and pull requests are welcome at [github.com/chiru1122006/logicraftstudios](https://github.com/chiru1122006/logicraftstudios).
 
-If you'd like to support the project financially, see the [Support the Project](#support-the-project) section above or sponsor directly at [github.com/sponsors/chiru1122006](https://github.com/sponsors/chiru1122006).
+Lead Author & Maintainer: **Chirudeep Reddy** ([@chiru1122006](https://github.com/chiru1122006))
 
 > **Note:** All contributors must sign a Contributor License Agreement (CLA) so that the dual-licensing model remains valid. A CLA check runs automatically on pull requests.
 
 ## License
 
-Velxio uses a **dual-licensing** model:
+Logicraft Studios uses a **dual-licensing** model:
 
 | Use case | License | Cost |
 | --- | --- | --- |
@@ -411,11 +393,11 @@ See [LICENSE](LICENSE) and [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md) for fu
 
 ## Star History
 
-<a href="https://www.star-history.com/?type=date&repos=chiru1122006%2Fvelxio">
+<a href="https://www.star-history.com/?type=date&repos=chiru1122006%2Flogicraftstudios">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=chiru1122006/velxio&type=date&theme=dark&legend=top-left&sealed_token=kw0zv7Q1xq7XgYk9MJ3Tzg2RixZ8GK74heH5o8WfUzvGZyY1UbCJox3XLfg2vDtHGdDd-5NE5XQWgC57joU_MyrfKxZkvcehtOQNjmT-PuG2p6d3dUkNM2r41KRyPjthNj3bZ_geKv4v7cnQLV7sll4lQDqxwO7ViC3G" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=chiru1122006/velxio&type=date&legend=top-left&sealed_token=kw0zv7Q1xq7XgYk9MJ3Tzg2RixZ8GK74heH5o8WfUzvGZyY1UbCJox3XLfg2vDtHGdDd-5NE5XQWgC57joU_MyrfKxZkvcehtOQNjmT-PuG2p6d3dUkNM2r41KRyPjthNj3bZ_geKv4v7cnQLV7sll4lQDqxwO7ViC3G" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=chiru1122006/velxio&type=date&legend=top-left&sealed_token=kw0zv7Q1xq7XgYk9MJ3Tzg2RixZ8GK74heH5o8WfUzvGZyY1UbCJox3XLfg2vDtHGdDd-5NE5XQWgC57joU_MyrfKxZkvcehtOQNjmT-PuG2p6d3dUkNM2r41KRyPjthNj3bZ_geKv4v7cnQLV7sll4lQDqxwO7ViC3G" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=chiru1122006/logicraftstudios&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=chiru1122006/logicraftstudios&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=chiru1122006/logicraftstudios&type=date&legend=top-left" />
  </picture>
 </a>
 
@@ -433,7 +415,7 @@ See [LICENSE](LICENSE) and [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md) for fu
 - [esp32-camera](https://github.com/espressif/esp32-camera) — ESP32 camera driver reference
 - [fritzing-parts](https://github.com/fritzing/fritzing-parts) — Electronic component SVG assets
 - [picowi](https://github.com/jbentham/picowi) — Raspberry Pi Pico W WiFi reference
-- [100 Days 100 IoT Projects](https://github.com/velxio/100_Days_100_IoT_Projects) — IoT example projects collection
+- [100 Days 100 IoT Projects](https://github.com/logicraftstudios/100_Days_100_IoT_Projects) — IoT example projects collection
 - [arduino-cli](https://github.com/arduino/arduino-cli) — Arduino compiler
 - [Monaco Editor](https://microsoft.github.io/monaco-editor/) — Code editor
 - [QEMU](https://www.qemu.org) — Machine emulator (Raspberry Pi 3)
