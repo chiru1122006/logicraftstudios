@@ -1070,7 +1070,8 @@ export async function piSyncAndRunScript(boardId: string, boardKind: string): Pr
                 || files.find((f) => f.path.endsWith('/script.py'))
                 || files[0];
   const targetScript = mainFile ? mainFile.path : `${home}/main.py`;
-  const cmd = proDef?.autoRun ?? `ln -sf ${targetScript} ${home}/script.py 2>/dev/null; python3 ${targetScript}`;
+  const linkCmd = targetScript !== `${home}/script.py` ? `ln -sf ${targetScript} ${home}/script.py 2>/dev/null; ` : '';
+  const cmd = proDef?.autoRun ?? `${linkCmd}python3 ${targetScript}`;
   bridge.sendSerialText(cmd.endsWith('\n') ? cmd : cmd + '\n');
 }
 
