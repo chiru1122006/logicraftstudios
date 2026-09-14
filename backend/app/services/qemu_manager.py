@@ -420,14 +420,9 @@ class QemuManager:
             '-nic',     'none',
             '-display', 'none',
             '-monitor', 'none',
-            '-serial',  'none',
-            # Console: TCP chardev → virtio-console → /dev/hvc0 inside
-            # the guest. The frontend serial WebSocket connects to this
-            # port (replaces the old ttyAMA0 path).
-            '-chardev', f'socket,id=cons,host=127.0.0.1,port={inst.serial_port},'
-                       f'server=on,wait=off',
-            '-device', serial_dev,
-            '-device', 'virtconsole,chardev=cons',
+            # Console: TCP chardev on PL011 UART (/dev/ttyAMA0).
+            # The frontend serial WebSocket connects to this port.
+            '-serial',  f'tcp:127.0.0.1:{inst.serial_port},server=on,wait=off',
             # Protocol channel: pipe (FIFO pair) instead of a socket
             # chardev. virtserialport on socket chardev has a known
             # guest→host flow bug in QEMU 10 (see decisions.md D9).
@@ -436,18 +431,15 @@ class QemuManager:
             # Inside the guest this still appears as /dev/vport<N>p<M>
             # with the name "velxio-protocol".
             '-chardev', f'pipe,id=proto,path={inst.proto_pipe_base}',
+            '-device', serial_dev,
             '-device', 'virtserialport,chardev=proto,name=velxio-protocol',
             # Kernel cmdline:
-            #   console=hvc0 — the virtio-console is the user terminal.
-            #   root=/dev/vda — the virtio-blk overlay is the rootfs.
-            #   rw — userspace can write (overlay catches writes).
-            #   quiet — suppress most printk so the user sees the shell
-            #           banner cleanly.
-            #   panic=10 — auto-reboot 10 s after a panic instead of
-            #              hanging forever (defensive against bad user
-            #              rootfs uploads in Phase 4).
-            '-append', 'console=hvc0 root=/dev/vda rw quiet panic=10',
+            #   console=ttyAMA0,115200 — PL011 UART user terminal.
+            #   rdinit=/bin/sh — boot directly into the RAM-resident shell.
+            #   panic=10 — auto-reboot 10 s after a panic.
+            '-append', 'console=ttyAMA0,115200 rdinit=/bin/sh panic=10',
         ]
+
 
         logger.info('Launching QEMU for %s: %s',
                     inst.client_id, ' '.join(cmd))
@@ -505,20 +497,33 @@ class QemuManager:
     async def _read_serial(self, inst: PiInstance,
                             reader: asyncio.StreamReader) -> None:
         buf = bytearray()
+        logger.info('%s: _read_serial started (running=%s)', inst.client_id, inst.running)
+        read_count = 0
+        timeout_count = 0
         while inst.running:
             try:
                 chunk = await asyncio.wait_for(reader.read(256), timeout=0.1)
                 if not chunk:
+                    logger.warning('%s: _read_serial got empty chunk (EOF), breaking', inst.client_id)
                     break
+                read_count += 1
                 buf.extend(chunk)
                 text = buf.decode('utf-8', errors='replace')
                 buf.clear()
+                if read_count <= 5 or read_count % 50 == 0:
+                    logger.info('%s: serial read #%d len=%d: %r',
+                                inst.client_id, read_count, len(text), text[:80])
                 await inst.emit('serial_output', {'data': text})
             except asyncio.TimeoutError:
+                timeout_count += 1
+                if timeout_count <= 3 or timeout_count % 500 == 0:
+                    logger.debug('%s: _read_serial timeout #%d', inst.client_id, timeout_count)
                 continue
             except Exception as e:
                 logger.warning('%s serial read: %s', inst.client_id, e)
                 break
+        logger.info('%s: _read_serial exited (running=%s, reads=%d, timeouts=%d)',
+                    inst.client_id, inst.running, read_count, timeout_count)
 
     # ── Protocol channel (virtio-serial / /dev/vport0p2) ──────────────────────
     # Methods keep the historical "_gpio" naming so the rest of the

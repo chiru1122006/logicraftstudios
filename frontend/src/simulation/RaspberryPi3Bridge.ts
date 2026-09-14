@@ -322,11 +322,12 @@ export class RaspberryPi3Bridge {
   private _observeSerial(text: string): void {
     this._serialTail = (this._serialTail + text).slice(-512);
     const clean = RaspberryPi3Bridge._stripAnsi(this._serialTail);
-    if (!this._booted && (/login on 'hvc0'/.test(clean) || /:~[#$]/.test(clean) || /root@raspberrypi/.test(clean))) {
+    if (!this._booted && (/login on 'hvc0'/.test(clean) || /:~[#$]/.test(clean) || /root@raspberrypi/.test(clean) || /~ #/.test(clean) || /#\s*$/.test(clean))) {
       this._booted = true;
       this._emitLocal('\r\n[Logicraft Studios] Linux guest booted successfully! Ready for input.\r\n');
       this.onBooted?.();
     }
+
     // A shell prompt ends in "# " / "$ " (trailing space, no newline). Trim
     // only trailing spaces/tabs (not newlines) so command OUTPUT ending in
     // "#\n" is NOT mistaken for a prompt; heredoc continuation "> " is also
