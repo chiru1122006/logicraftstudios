@@ -1,0 +1,532 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+**Velxio** — a fully local, open-source Arduino emulator 
+- GitHub: https://github.com/chiru1122006/velxio
+- Frontend: React + Vite + TypeScript with Monaco Editor and visual simulation canvas
+- Backend: FastAPI + Python for Arduino code compilation via arduino-cli
+- Simulation: Real AVR8 emulation using avr8js with full GPIO/timer/USART support
+- Components: Visual electronic components from wokwi-elements (LEDs, resistors, buttons, etc.)
+- Auth: None — OSS is single-user anonymous. Accounts + OAuth live in the
+  velxio-prod private overlay that powers logicraftstudios.tech.
+- Project persistence: `.vlx` file export/import (`utils/vlxFile.ts`) —
+  zero server-side state. Server-side persistence (SQLite or Postgres
+  via SQLAlchemy) lives in the velxio-prod overlay.
+
+The project uses **local clones of official Wokwi repositories** in `third-party/` instead of npm packages.
+
+## Development Commands
+
+### Backend (FastAPI + Python)
+
+**Setup:**
+```bash
+cd backend
+python -m venv venv
+venv\Scripts\activate  # Windows
+pip install -r requirements.txt
+```
+
+**Run development server:**
+```bash
+cd backend
+venv\Scripts\activate
+uvicorn app.main:app --reload --port 8001
+```
+
+**Access:**
+- API: http://localhost:8001
+- Docs: http://localhost:8001/docs
+
+### Frontend (React + Vite)
+
+**Setup:**
+```bash
+cd frontend
+npm install
+```
+
+**Run development server:**
+```bash
+cd frontend
+npm run dev
+```
+
+**Build for production:**
+```bash
+cd frontend
+npm run build
+```
+
+**Docker build (skips tsc type-check, uses esbuild only):**
+```bash
+npm run build:docker
+```
+
+**Lint:**
+```bash
+cd frontend
+npm run lint
+```
+
+**Access:**
+- App: http://localhost:5173
+
+### Wokwi Libraries (npm)
+
+`@wokwi/elements`, `avr8js` and `rp2040js` are pulled directly from the npm
+registry — see version pins in `frontend/package.json`. No clone or local
+build is required for the Docker image, manual install, or CI.
+
+The folders under `third-party/` are reference-only (credits / offline
+hacking). The one exception is `qemu-lcgamboa` (real source dependency for
+ESP32 emulation when rebuilding QEMU).
+
+**Bump a wokwi lib version:** edit the version string in
+`frontend/package.json` and run `npm install` in `frontend/`.
+
+**Adding new components to wokwi-elements:** the metadata generator
+(`scripts/generate-component-metadata.ts`) scans the upstream `src/`,
+which the npm package doesn't ship. Clone wokwi-elements once into
+`third-party/wokwi-elements/` and run `npm run generate:metadata`. The
+script gracefully skips when the clone is absent — `components-metadata.json`
+is committed.
+
+### External Dependencies
+
+**arduino-cli** must be installed on your system:
+```bash
+# Verify installation
+arduino-cli version
+
+# Initialize (first time)
+arduino-cli core update-index
+arduino-cli core install arduino:avr
+```
+
+## Architecture
+
+### High-Level Data Flow
+
+1. **Code Editing**: User writes Arduino code → Monaco Editor → Zustand store (`useEditorStore`)
+2. **Compilation**: Files → Frontend API call → Backend FastAPI → arduino-cli subprocess → Returns .hex file
+3. **Simulation**: .hex file → AVRSimulator.loadHex() → Parsed into Uint16Array → CPU execution loop
+4. **Pin Updates**: CPU writes to PORTB/C/D → Port listeners → PinManager → Component state updates
+5. **Visual Updates**: Component state changes → React re-renders → wokwi-elements update visually
+
+### Critical Architecture Patterns
+
+**1. Wokwi libs come from npm**
+
+`@wokwi/elements`, `avr8js` and `rp2040js` are listed as regular
+dependencies in `frontend/package.json`. Vite resolves them from
+`node_modules` like any other package — no aliases, no `file:` references.
+
+**2. Multi-File Workspace (useEditorStore)**
+
+The editor supports multiple files. `useEditorStore` holds:
+```typescript
+interface WorkspaceFile { id: string; name: string; content: string; modified: boolean; }
+// State:
+files: WorkspaceFile[]
+activeFileId: string
+openFileIds: string[]
+// Key operations:
+createFile, deleteFile, renameFile, setFileContent, markFileSaved,
+openFile, closeFile, setActiveFile, loadFiles, setCode (legacy)
+```
+`setCode` is a legacy setter that writes to the active file's content — used by old call sites.
+`loadFiles` replaces all files when loading a saved project.
+
+**3. Multi-File Compilation**
+
+The backend accepts an array of files, not a single code string:
+```typescript
+// Frontend (compilation.ts)
+interface SketchFile { name: string; content: string; }
+compileCode(files: SketchFile[], board: string)
+// sends: { files, board_fqbn: board }
+
+// Backend (compile.py)
+class SketchFile(BaseModel): name: str; content: str
+class CompileRequest:
+    files: list[SketchFile] | None = None
+    code: str | None = None  # legacy fallback
+```
+The backend promotes the first `.ino` to `sketch.ino` and applies RP2040 Serial redirect only to `sketch.ino`.
+
+**4. AVR Simulation Loop**
+
+The simulation runs at ~60 FPS using `requestAnimationFrame`:
+- Each frame executes ~267,000 CPU cycles (16MHz / 60fps)
+- Port listeners fire when PORTB/C/D registers change
+- PinManager maps Arduino pins to components (e.g., pin 13 → LED_BUILTIN)
+
+**5. State Management with Zustand**
+
+Main stores:
+- `useEditorStore`: Multi-file workspace (files[], activeFileId, openFileIds)
+- `useSimulatorStore`: Simulation state, components, wires, compiled hex, serialMonitorOpen
+- `useProjectStore`: Current loaded project metadata (id, slug, name) — used by the `.vlx` exporter to pick a download filename
+- `useAuthStore` (overlay-only) lives in `pro/frontend/src/pro/store/` in the velxio-prod repo. Pure OSS builds do not include it.
+
+**6. Component-Pin Mapping**
+
+Components are connected to Arduino pins via the PinManager:
+- PORTB maps to digital pins 8-13 (pin 13 = built-in LED)
+- PORTC maps to analog pins A0-A5
+- PORTD maps to digital pins 0-7
+
+**7. Wire System**
+
+Wires are stored as objects with start/end endpoints:
+```typescript
+{
+  id: string
+  start: { componentId, pinName, x, y }
+  end: { componentId, pinName, x, y }
+  color: string
+  signalType: 'digital' | 'analog' | 'power-vcc' | 'power-gnd'
+}
+```
+Wire positions auto-update when components move via `updateWirePositions()`.
+
+## Key File Locations
+
+### Backend (OSS — stateless)
+- [backend/app/main.py](backend/app/main.py) - FastAPI app entry point, CORS, lifespan hooks
+- [backend/app/api/routes/compile.py](backend/app/api/routes/compile.py) - Compilation endpoints (multi-file, sync + async)
+- [backend/app/api/routes/compile_chip.py](backend/app/api/routes/compile_chip.py) - Custom-chip WASM compile
+- [backend/app/api/routes/libraries.py](backend/app/api/routes/libraries.py) - arduino-cli library search/install proxy
+- [backend/app/api/routes/simulation.py](backend/app/api/routes/simulation.py) - WebSocket bridge to QEMU workers
+- [backend/app/api/routes/iot_gateway.py](backend/app/api/routes/iot_gateway.py) - HTTP proxy for ESP32 web servers
+- [backend/app/services/arduino_cli.py](backend/app/services/arduino_cli.py) - arduino-cli wrapper
+- [backend/app/services/espidf_compiler.py](backend/app/services/espidf_compiler.py) - ESP-IDF compile wrapper
+- [backend/app/services/build_queue.py](backend/app/services/build_queue.py) - Priority admission gate for compile jobs (two lanes, unbounded, one slot per lane reserved for standard builds). Exposes only a coarse load level — queue depth and position never reach a client.
+- [backend/app/core/config.py](backend/app/core/config.py) - Minimal Settings (FRONTEND_URL only)
+- [backend/app/core/hooks.py](backend/app/core/hooks.py) - Extension hooks (record_compile, get_current_user_id, lifespan_startup) that the velxio-prod overlay fills in. OSS-default = no-op.
+
+**Removed in the OSS/pro split (Phase 1-4):** auth.py, projects.py,
+admin.py, metrics.py, models/*, schemas/*, services/metrics.py,
+services/odoo_mail.py, services/project_files.py, database/session.py,
+core/dependencies.py, core/security.py, utils/{geo,slug,boards}.py. All
+of these live in [velxio-prod](https://github.com/velxio/velxio-prod)'s
+private overlay and are COPYed onto the image at Docker build time when
+deploying logicraftstudios.tech.
+
+### Frontend - Core
+- [frontend/src/App.tsx](frontend/src/App.tsx) - Main app component, routing (with overlay route injection via `useProRoutes`)
+- [frontend/src/lib/proRoutes.ts](frontend/src/lib/proRoutes.ts) - Registry for routes the overlay registers at runtime
+- [frontend/src/lib/proSession.ts](frontend/src/lib/proSession.ts) - Optional session-check hook installed by the overlay
+- [frontend/src/lib/proSaveAction.ts](frontend/src/lib/proSaveAction.ts) - Save-button registry. Default = download `.vlx`; overlay overrides with SaveProjectModal.
+- [frontend/src/utils/vlxFile.ts](frontend/src/utils/vlxFile.ts) - Portable project export/import (no server needed)
+- [frontend/src/store/useEditorStore.ts](frontend/src/store/useEditorStore.ts) - Multi-file workspace state
+- [frontend/src/store/useSimulatorStore.ts](frontend/src/store/useSimulatorStore.ts) - Simulation state, components, wires
+- [frontend/src/store/useProjectStore.ts](frontend/src/store/useProjectStore.ts) - Current loaded project metadata
+
+### Frontend - Editor UI
+- [frontend/src/components/editor/CodeEditor.tsx](frontend/src/components/editor/CodeEditor.tsx) - Monaco editor (key={activeFileId} for per-file undo history)
+- [frontend/src/components/editor/EditorToolbar.tsx](frontend/src/components/editor/EditorToolbar.tsx) - Compile/Run/Stop buttons (reads files[], not code)
+- [frontend/src/components/editor/FileExplorer.tsx](frontend/src/components/editor/FileExplorer.tsx) - Sidebar file list with SVG icons, rename, delete, save button
+- [frontend/src/components/editor/FileTabs.tsx](frontend/src/components/editor/FileTabs.tsx) - Open file tabs with unsaved-changes indicator and close dialog
+
+### Frontend - Layout
+- [frontend/src/components/layout/AppHeader.tsx](frontend/src/components/layout/AppHeader.tsx) - Top header (no Save button — moved to FileExplorer)
+- [frontend/src/components/layout/SaveProjectModal.tsx](frontend/src/components/layout/SaveProjectModal.tsx) - Save/update project (reads files[], uses sketch.ino content)
+- [frontend/src/components/layout/LoginPromptModal.tsx](frontend/src/components/layout/LoginPromptModal.tsx) - Prompt anon users
+
+### Frontend - Simulation
+- [frontend/src/simulation/AVRSimulator.ts](frontend/src/simulation/AVRSimulator.ts) - AVR8 CPU emulator wrapper
+- [frontend/src/simulation/PinManager.ts](frontend/src/simulation/PinManager.ts) - Maps Arduino pins to components
+- [frontend/src/utils/hexParser.ts](frontend/src/utils/hexParser.ts) - Intel HEX format parser
+- [frontend/src/components/simulator/SimulatorCanvas.tsx](frontend/src/components/simulator/SimulatorCanvas.tsx) - Canvas + Serial button next to board selector
+
+### Frontend - Pages
+- [frontend/src/pages/EditorPage.tsx](frontend/src/pages/EditorPage.tsx) - Main editor layout (resizable file explorer + panels)
+- [frontend/src/pages/LoginPage.tsx](frontend/src/pages/LoginPage.tsx)
+- [frontend/src/pages/RegisterPage.tsx](frontend/src/pages/RegisterPage.tsx)
+- [frontend/src/pages/UserProfilePage.tsx](frontend/src/pages/UserProfilePage.tsx) - Profile with project grid
+- [frontend/src/pages/ProjectPage.tsx](frontend/src/pages/ProjectPage.tsx) - Loads project into editor
+
+### Frontend - SEO & Public Files
+- `frontend/index.html` — Full SEO meta tags, OG, Twitter Card, JSON-LD. **Domain is `https://logicraftstudios.tech`** — update if domain changes.
+- `frontend/public/favicon.svg` — SVG chip favicon (scales to all sizes)
+- `frontend/public/og-image.svg` — 1200×630 social preview image (OG/Twitter). Export as PNG for max compatibility.
+- `frontend/public/robots.txt` — Allow all crawlers, points to sitemap
+- `frontend/public/sitemap.xml` — All public routes with priorities
+- `frontend/public/manifest.webmanifest` — PWA manifest, theme color `#007acc`
+
+### Docker & CI
+- [Dockerfile.standalone](Dockerfile.standalone) - Multi-stage Docker build
+- [.github/workflows/docker-publish.yml](.github/workflows/docker-publish.yml) - Publishes to GHCR + Docker Hub on push to master
+
+## Important Implementation Notes
+
+### 1. AVR Instruction Execution
+
+The simulation **must call both** `avrInstruction()` and `cpu.tick()` in the execution loop:
+```typescript
+avrInstruction(this.cpu);  // Execute the AVR instruction
+this.cpu.tick();           // Update peripheral timers and cycles
+```
+
+### 2. Port Listeners
+
+Port listeners in AVRSimulator.ts are attached to AVRIOPort instances, NOT directly to CPU registers:
+```typescript
+this.portB!.addListener((value, oldValue) => {
+  // value is the PORTB register value (0-255)
+  // Check individual pins: this.portB!.pinState(5) for pin 13
+});
+```
+
+### 3. HEX File Format
+
+Arduino compilation produces Intel HEX format. The parser in `hexParser.ts`:
+- Parses lines starting with `:`
+- Extracts address, record type, and data bytes
+- Returns a `Uint8Array` of program bytes
+- AVRSimulator converts this to `Uint16Array` (16-bit words, little-endian)
+
+### 4. Component Registration
+
+To add a component to the simulation:
+1. Add it to the canvas in SimulatorCanvas.tsx
+2. Register a pin change callback in PinManager
+3. Update component state when pin changes
+
+### 5. CORS Configuration
+
+Backend allows specific Vite dev ports (5173-5175). Update `backend/app/main.py` if using different ports.
+
+### 6. Wokwi Elements Integration
+
+Wokwi elements are Web Components. React wrappers declare custom elements:
+```typescript
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'wokwi-led': any;
+    }
+  }
+}
+```
+
+### 6a. Boards/components MUST be Web Components, not React SVG ⚠️
+
+The wire system reads pin coordinates via `element.pinInfo` from the rendered
+DOM node (`frontend/src/utils/pinPositionCalculator.ts:38`). This **only**
+works for real DOM custom elements (Web Components) — a plain React `<svg>`
+component has no `pinInfo`, so every wire endpoint silently falls back to
+`(0, 0)` of the board and visually attaches to the **corner** instead of the
+pin. The user has reported this exact symptom multiple times.
+
+**Rule:** any board or component that needs wire connections must be a Web
+Component (`class Foo extends HTMLElement`) with a `pinInfo` getter. The
+React `.tsx` file is a thin wrapper.
+
+Reference implementations:
+- `frontend/src/components/velxio-components/Esp32Element.ts` (board)
+- `frontend/src/components/velxio-components/PiPicoWElement.ts` (board)
+- `frontend/src/components/velxio-components/Attiny85Element.ts` (board)
+- `frontend/src/components/velxio-components/Bmp280Element.ts` (component)
+
+Required shape:
+```ts
+class FooElement extends HTMLElement {
+  constructor() { super(); this.attachShadow({ mode: 'open' }); }
+  connectedCallback() { this.render(); }
+  get pinInfo() {
+    // Pin tip coordinates in CSS pixels relative to element top-left.
+    // `name` must match what examples reference in wires.
+    return [
+      { name: 'GP0', x: 6, y: 24, description: 'UART0 TX' },
+      // …
+    ];
+  }
+  private render() { /* shadowRoot.innerHTML = ... */ }
+}
+if (!customElements.get('velxio-foo')) {
+  customElements.define('velxio-foo', FooElement);
+}
+```
+
+The `.tsx` wrapper:
+```tsx
+import './FooElement';
+declare global {
+  namespace JSX { interface IntrinsicElements { 'velxio-foo': any; } }
+}
+export const Foo = ({ id, x, y }: Props) => (
+  <velxio-foo id={id} style={{ position: 'absolute', left: x, top: y }} />
+);
+```
+
+**Verification before claiming a board/component is done:** load an example
+that wires to it, confirm wires terminate on the pin tips (not the corner),
+and add the pin coords to `BoardOnCanvas.tsx`'s `BOARD_SIZE` table if it's a
+board.
+
+### 6b. Component metadata JSON is GENERATED — never edit by hand ⚠️
+
+`frontend/public/components-metadata.json` is produced by
+`scripts/generate-component-metadata.ts`. **Direct edits get wiped** the
+next time the generator runs (which happens on every third-party update,
+plus anyone who runs `npm run generate:metadata` from `frontend/`).
+
+For Velxio-native components that don't exist in wokwi-elements (custom
+chips, ePaper panels, logic gates, voltmeters, …) add the entry to
+**`scripts/component-overrides.json`** under the `_customComponents`
+array. The generator copies them verbatim into the output and they
+survive every regeneration.
+
+For wokwi-elements-derived components that need a richer UI control
+(e.g. LED color → dropdown, SSD1306 protocol → I2C/SPI selector), add a
+keyed entry under the same file with `properties` + `defaultValues`
+patches (see `docs/wiki/component-metadata-generator.md`).
+
+To regenerate after editing the override file:
+
+```bash
+cd frontend
+npm run generate:metadata
+```
+
+(The script needs `tsx` and `typescript` resolvable; the npm script in
+`frontend/package.json:8` is the supported entry point — if it errors
+with "Cannot find module 'typescript'", run with
+`NODE_PATH="$PWD/frontend/node_modules" npx tsx scripts/generate-component-metadata.ts`
+from the repo root.)
+
+### 7. Pre-existing TypeScript Errors
+
+There are known pre-existing TS errors that do NOT block the app from running:
+- `wokwi-elements` JSX custom element types (`wokwi-led`, `wokwi-arduino-uno`, etc.)
+- `@monaco-editor/react` type compatibility with React 19
+- Test mock type mismatches in `AVRSimulator.test.ts`
+
+**Do not fix these unless explicitly asked.** They are suppressed in Docker builds by using `build:docker` which runs `vite build` only (no `tsc -b`). Local `npm run build` runs `tsc -b` and will show these errors.
+
+### 8. Docker Build — third-party
+
+`Dockerfile.standalone` does NOT clone any wokwi-* repos. The frontend stage
+just does `COPY frontend/ scripts/` then `npm install && npm run build:docker`,
+which pulls `@wokwi/elements`, `avr8js`, `rp2040js` from npm. Board SVGs live
+in `frontend/public/boards/`, component SVGs in `frontend/public/component-svgs/`,
+and `components-metadata.json` is committed.
+
+The frontend-tests CI workflow only clones `wokwi-elements` (for the
+metadata staleness check), not the other two.
+
+### 9. Backend Gotchas
+
+- **RP2040 board manager**: arduino-cli needs the earlephilhower URL before `rp2040:rp2040` install:
+  ```
+  arduino-cli config add board_manager.additional_urls \
+    https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
+  ```
+
+## Testing
+
+### Backend Testing
+Test compilation directly:
+```bash
+cd backend
+python test_compilation.py
+```
+
+### Frontend Testing
+Vitest is configured. Run tests:
+```bash
+cd frontend
+npm test
+```
+
+## Common Development Scenarios
+
+### Adding a New Electronic Component
+
+1. Check if wokwi-elements has the component — either browse
+   https://github.com/wokwi/wokwi-elements or `ls third-party/wokwi-elements/src/`
+   if the optional clone is present
+2. Create React wrapper in `frontend/src/components/components-wokwi/`
+3. Add component type to `useSimulatorStore` interface
+4. Update SimulatorCanvas to render the component
+5. Register pin callbacks in PinManager if interactive
+
+### Adding a New API Endpoint
+
+1. Create route in `backend/app/api/routes/`
+2. Include router in `backend/app/main.py`
+3. Add corresponding service in `backend/app/services/` if needed
+4. Create API client function in `frontend/src/services/`
+
+### Debugging Simulation Issues
+
+Common issues:
+- **LED doesn't blink**: Check port listeners are firing (console logs), verify pin mapping
+- **Compilation fails**: Check arduino-cli is in PATH, verify `arduino:avr` core is installed
+- **CPU stuck at PC=0**: Ensure `avrInstruction()` is being called in execution loop
+- **Wire positions wrong**: Check `calculatePinPosition()` uses correct component coordinates
+
+Enable verbose logging:
+- AVRSimulator logs port changes and CPU state every 60 frames
+- Backend logs all compilation steps and arduino-cli output
+
+## Project Status
+
+**Implemented:**
+- Full Arduino code editing with Monaco Editor
+- **Multi-file workspace** — create, rename, delete, open/close tabs, unsaved-changes indicator
+- Compilation via arduino-cli to .hex files (multi-file sketch support)
+- Real AVR8 emulation with avr8js
+- RP2040 emulation with rp2040js
+- Pin state tracking and component updates
+- Dynamic component system with 48+ wokwi-elements components
+- Component picker modal with search and categories
+- Component property dialog (single-click interaction)
+- Component rotation (90° increments)
+- Wire creation and rendering (orthogonal routing)
+- Segment-based wire editing (drag segments perpendicular to orientation)
+- Real-time wire preview with grid snapping (20px)
+- Pin overlay system for wire connections
+- Serial Monitor with baud rate detection and send
+- ILI9341 TFT display simulation
+- Library Manager (install/search arduino libraries)
+- Example projects gallery
+- **Portable project persistence**: `.vlx` file export/import — single-file JSON snapshot of the whole workspace, no server, no DB
+- **Resizable file explorer** panel (drag handle, collapse toggle)
+- Docker standalone image published to GHCR + Docker Hub
+- **OSS / pro split**: auth, accounts, public profiles, admin panel, server-side project URLs and analytics live in the private [velxio-prod](https://github.com/velxio/velxio-prod) overlay that runs logicraftstudios.tech. OSS is single-user, anonymous, fully self-hostable.
+
+**In Progress:**
+- Functional wire connections (electrical signal routing)
+- Wire validation and error handling
+
+**Electrical Simulation (Phase 8 — behind ⚡ toggle):**
+- ngspice-WASM engine via `eecircuit-engine` (lazy-loaded, ~39 MB chunk).
+- Entry: `frontend/src/simulation/spice/SpiceEngine.lazy.ts`
+- NetlistBuilder: `frontend/src/simulation/spice/NetlistBuilder.ts` — Union-Find on `wires[]` → SPICE cards via `componentToSpice.ts`.
+- Store: `useElectricalStore` (separate from `useSimulatorStore`; feature-flagged).
+- UI: `<ElectricalModeToggle />` in toolbar, `<ElectricalOverlay />` on canvas.
+- Probes: `instr-voltmeter`, `instr-ammeter` metadata IDs.
+- Build-time flag: `VITE_ELECTRICAL_SIM=false` to disable completely.
+- Tests: `frontend/src/__tests__/spice-*.test.ts`, `netlist-builder.test.ts`, `component-to-spice.test.ts`, `instruments.test.ts` (39+ tests).
+- Reference sandbox: `test/test_circuit/` (47 tests proving the approach).
+- Docs: `docs/wiki/circuit-emulation.md` (implementation details), `docs/wiki/electrical-simulation-user-guide.md` (user-facing).
+
+**Planned:**
+- Undo/redo functionality
+- More boards (ESP32, Arduino Mega, Arduino Nano)
+- Export/Import projects as files
+
+## Additional Resources
+
+- Main README: [README.md](README.md)
+- Architecture Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- Wokwi Elements Repo: https://github.com/wokwi/wokwi-elements
+- AVR8js Repo: https://github.com/wokwi/avr8js
+- Arduino CLI Docs: https://arduino.github.io/arduino-cli/

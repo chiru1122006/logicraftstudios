@@ -1,0 +1,177 @@
+[Velxio — Free Online Circuit & Arduino Simulator | SPICE · ESP32 · RP2040 · ATtiny85 · Custom Chips](http://localhost:5174/)
+
+# Velxio — Free Online Circuit & Arduino Simulator | SPICE · ESP32 · RP2040 · ATtiny85 · Custom Chips
+
+[Editor](http://localhost:5174/editor)
+[Examples](http://localhost:5174/examples)
+[Velxio 2.5 (SPICE)](http://localhost:5174/v2-5)
+[Circuit Simulator](http://localhost:5174/circuit-simulator)
+[SPICE Simulator](http://localhost:5174/spice-simulator)
+[Custom Chip Simulator](http://localhost:5174/custom-chip-simulator)
+[Arduino Simulator](http://localhost:5174/arduino-simulator)
+[Arduino Emulator](http://localhost:5174/arduino-emulator)
+[ATmega328P Simulator](http://localhost:5174/atmega328p-simulator)
+[ATtiny85 Simulator](http://localhost:5174/attiny85-simulator)
+[Arduino Mega Simulator](http://localhost:5174/arduino-mega-simulator)
+[ESP32 Simulator](http://localhost:5174/esp32-simulator)
+[ESP32-C3 Simulator](http://localhost:5174/esp32-c3-simulator)
+[Raspberry Pi Pico Simulator](http://localhost:5174/raspberry-pi-pico-simulator)
+[Raspberry Pi 3 Simulator](http://localhost:5174/raspberry-pi-simulator)
+[GitHub](https://github.com/chiru1122006/velxio)
+[Discord](https://discord.gg/3mARjJrh4E)
+[Documentation](http://localhost:5174/docs/intro)
+[About](http://localhost:5174/about)
+
+## Free online circuit + microcontroller simulator — SPICE-accurate analog wired to Arduino, ESP32, RP2040, ATtiny85 & more
+
+Velxio is a free, open-source online circuit simulator with hybrid digital + analog co-simulation. Real-time SPICE analysis (ngspice-WASM) wired to 19 supported boards across 5 CPU architectures. Build custom chips in C, Rust, or AssemblyScript. 100+ interactive components, live oscilloscope, voltmeter, ammeter, Monaco Editor, Serial Monitor, arduino-cli compiler, and Library Manager — no cloud, no latency, no account required.
+
+### What's new in Velxio 2.5
+- Real-time SPICE analog simulation in your browser via ngspice-WASM (eecircuit-engine) — Modified Nodal Analysis at ~60 Hz, not a linear approximation
+- Hybrid digital + analog co-simulation — GPIO pins drive SPICE nets as voltage sources; analogRead() reads solved node voltages back into firmware
+- 100+ SPICE-accurate parts: resistors, capacitors, inductors, BJTs, MOSFETs, op-amps (LM358/741/TL072), regulators (7805/7812/LM317), Zener/Schottky diodes, optocouplers, relays
+- Live instruments: oscilloscope (multi-channel), voltmeter, ammeter, signal generator (sine/square/DC)
+- 40+ new analog & hybrid examples: voltage divider, RC filter, full-wave rectifier, Schmitt trigger, op-amp amplifier, Wheatstone bridge, H-bridge motor driver
+
+```
+analogRead()
+```
+
+### Features
+- Real AVR8 emulation: Arduino Uno (ATmega328p), Nano, Mega 2560, ATtiny85, Leonardo, Pro Mini at 16 MHz via avr8js
+- Raspberry Pi Pico & Pico W (RP2040, ARM Cortex-M0+ at 133 MHz) via rp2040js
+- ESP32-C3 / XIAO ESP32-C3 / SuperMini / CH32V003 (RISC-V RV32IMC/EC) — via QEMU lcgamboa (libqemu-riscv32)
+- ESP32 / ESP32-S3 / ESP32-CAM / Arduino Nano ESP32 (Xtensa LX6/LX7 at 240 MHz) via QEMU lcgamboa
+- Raspberry Pi 3B (ARM Cortex-A53, full Linux) via QEMU raspi3b — runs Python scripts with RPi.GPIO
+- Custom Chips — author your own integrated circuits in C, Rust, or AssemblyScript using the Wokwi Custom Chips API; reuse them across projects
+- 48+ wokwi interactive electronic components (LEDs, resistors, buttons, sensors, TFT displays, NeoPixel…)
+- Monaco Code Editor with full C++ / Python syntax highlighting
+- arduino-cli compilation backend — produces real .hex / .uf2 / .bin files
+- Serial Monitor with auto baud-rate detection and send
+- Library Manager for Arduino libraries
+- Multi-file workspace (.ino, .h, .cpp, .py)
+- Wire system with orthogonal routing
+- ILI9341 TFT display simulation
+- I2C, SPI, USART, ADC, PWM support
+- Multi-board canvas: mix Arduino + ESP32 + Raspberry Pi + analog circuits in one simulation
+
+### Supported Boards
+- Arduino Uno (ATmega328P) — full AVR8 emulation at 16 MHz
+- Arduino Nano (ATmega328P) — full AVR8 emulation at 16 MHz
+- Arduino Mega 2560 (ATmega2560) — 256 KB flash, 54 digital pins, 4 serial ports
+- ATtiny85 — AVR, 8 KB flash, DIP-8, all 6 I/O pins emulated
+- Arduino Leonardo (ATmega32u4) — USB HID capable AVR
+- Arduino Pro Mini (ATmega328P) — 3.3 V / 5 V variants
+- Raspberry Pi Pico (RP2040) — ARM Cortex-M0+ at 133 MHz
+- Raspberry Pi Pico W (RP2040) — ARM Cortex-M0+ + WiFi
+- ESP32-C3 DevKit (RISC-V RV32IMC) — 160 MHz, QEMU libqemu-riscv32
+- Seeed XIAO ESP32-C3 (RISC-V RV32IMC) — compact, QEMU libqemu-riscv32
+- ESP32-C3 SuperMini (RISC-V RV32IMC) — mini form factor
+- CH32V003 (RISC-V RV32EC) — 48 MHz, ultra-compact DIP-8
+- ESP32 DevKit V1 / C V4 (Xtensa LX6) — 240 MHz, WiFi, QEMU
+- ESP32-S3 (Xtensa LX7) — 240 MHz, dual-core, QEMU
+- ESP32-CAM (Xtensa LX6) — camera module, QEMU
+- Seeed XIAO ESP32-S3 (Xtensa LX7) — compact, QEMU
+- Arduino Nano ESP32 (Xtensa LX6) — Arduino form factor, QEMU
+- Raspberry Pi 3B (ARM Cortex-A53) — full Linux OS via QEMU raspi3b, runs Python
+
+### Get Started
+[Open the Editor](http://localhost:5174/editor) — no installation needed. Self-host with Docker: docker run -d -p 3080:80 ghcr.io/chiru1122006/velxio:master
+
+```
+docker run -d -p 3080:80 ghcr.io/chiru1122006/velxio:master
+```
+
+### Documentation
+Browse the full Velxio documentation to learn how to set up, configure, and extend the emulator:
+- [Introduction — What is Velxio and why use it?](http://localhost:5174/docs/intro)
+- [Getting Started — Hosted editor, Docker, and manual setup](http://localhost:5174/docs/getting-started)
+- [Emulator Architecture — AVR8 and RP2040 CPU emulation internals](http://localhost:5174/docs/emulator)
+- [Components Reference — All 48+ interactive electronic components](http://localhost:5174/docs/components)
+- [Project Architecture — System design, data flows, and stores](http://localhost:5174/docs/architecture)
+- [Wokwi Libraries — avr8js, wokwi-elements, rp2040js integration](http://localhost:5174/docs/third-party)
+- [MCP Server — AI agent integration via Model Context Protocol](http://localhost:5174/docs/mcp)
+- [Project Status — All implemented features and troubleshooting](http://localhost:5174/docs/setup)
+- [Roadmap — Implemented, in-progress, and planned features](http://localhost:5174/docs/roadmap)
+[Introduction — What is Velxio and why use it?](http://localhost:5174/docs/intro)
+[Getting Started — Hosted editor, Docker, and manual setup](http://localhost:5174/docs/getting-started)
+[Emulator Architecture — AVR8 and RP2040 CPU emulation internals](http://localhost:5174/docs/emulator)
+[Components Reference — All 48+ interactive electronic components](http://localhost:5174/docs/components)
+[Project Architecture — System design, data flows, and stores](http://localhost:5174/docs/architecture)
+[Wokwi Libraries — avr8js, wokwi-elements, rp2040js integration](http://localhost:5174/docs/third-party)
+[MCP Server — AI agent integration via Model Context Protocol](http://localhost:5174/docs/mcp)
+[Project Status — All implemented features and troubleshooting](http://localhost:5174/docs/setup)
+[Roadmap — Implemented, in-progress, and planned features](http://localhost:5174/docs/roadmap)
+
+### Frequently Asked Questions
+```
+analogRead()
+```
+
+## Free Online Circuit Simulator with SPICE
+Velxio is a free online circuit simulator with real-time SPICE analog simulation in your browser. Drop resistors, capacitors, op-amps, transistors, diodes, and voltage regulators on the canvas — every component is modelled with real ngspice device cards, not behavioural stand-ins. [Open Circuit Simulator →](http://localhost:5174/circuit-simulator)
+- ngspice-WASM engine — full Modified Nodal Analysis at ~60 Hz solve rate
+- Non-linear devices behave like real silicon: BJT cutoff/saturation, op-amp rails, diode forward drop
+- Live oscilloscope, voltmeter, ammeter, signal generator
+- 100+ SPICE-accurate parts: passives, semiconductors, logic ICs, regulators, optocouplers, relays
+- Always-on — no toggle, every circuit is SPICE-solved
+
+## SPICE Simulator Online — ngspice in Your Browser
+Velxio runs ngspice (the open-source SPICE simulator powering professional EDA tools) compiled to WebAssembly via eecircuit-engine. Full transient analysis, real device models, in your browser tab. No install, no account, works offline after the first load. [Open SPICE Simulator →](http://localhost:5174/spice-simulator)
+- Real ngspice — same engine, browser-native via WASM
+- 5 BJTs (2N2222, 2N3055, 2N3906, BC547, BC557)
+- 4 MOSFETs (2N7000, IRF540, IRF9540, FQP27P06)
+- 5 op-amps (LM358, LM741, TL072, LM324, ideal) with saturation rails
+- 4 linear regulators (7805, 7812, 7905, LM317)
+- Diodes: 1N4148, 1N4007, 1N5817, 1N5819, Zener 1N4733
+
+## Custom Chip Simulator — Define Your Own ICs in C / Rust
+Velxio implements the Wokwi Custom Chips API: write your chip logic in C, Rust, or AssemblyScript, compile to WebAssembly, and the simulator drives its pins like any other component. Build a sensor model, a digital protocol bridge, or a behavioural IC stand-in — and reuse it across projects. [Open Custom Chip Simulator →](http://localhost:5174/custom-chip-simulator)
+- Wokwi-compatible Custom Chips API with WASI shim
+- Pin reads/writes, attribute reads, timers
+- I²C and SPI bus integration
+- Save chips to your account and reuse across projects
+- Library of starter examples (sensors, decoders, bridges)
+
+## ATtiny85 Simulator — Real AVR Emulation in Your Browser
+Velxio simulates the ATtiny85 with cycle-accurate AVR8 emulation. Full DIP-8 pinout, 8 KB flash, 6 GPIOs, USI peripheral, 10-bit ADC, Timer0/Timer1 with PWM, and watchdog. Wire it to LEDs, sensors, or analog circuits and run real ATtiny code without a programmer. [Open ATtiny85 Simulator →](http://localhost:5174/attiny85-simulator)
+- Cycle-accurate ATtiny85 emulation via avr8js
+- All 6 I/O pins (PB0–PB5) with proper port behaviour
+- Timer0 (8-bit), Timer1 (8-bit), watchdog timer
+- 10-bit ADC with 4 input channels
+- USI peripheral for I²C / SPI bit-banging
+- Wire to SPICE analog parts for full circuit testing
+
+## Free Online Arduino Simulator
+Velxio is a free online Arduino simulator with real AVR8 emulation at 16 MHz. Simulate Arduino code with 48+ interactive electronic components directly in your browser — no install, no account required. [Open Arduino Simulator →](http://localhost:5174/arduino-simulator)
+- Arduino Uno (ATmega328P) simulation at 16 MHz
+- 48+ visual components: LEDs, sensors, displays, servos
+- Serial Monitor with auto baud-rate detection
+- Multi-file sketch support (.ino, .h, .cpp)
+- Free and open-source (GNU AGPLv3)
+
+## Arduino Emulator — Real AVR8 & RP2040 Emulation
+Velxio is a cycle-accurate Arduino emulator built on avr8js and rp2040js. Every AVR opcode is faithfully emulated at 16 MHz — the same silicon behavior as real hardware. [Open Arduino Emulator →](http://localhost:5174/arduino-emulator)
+- All 135 AVR8 instructions emulated
+- Hardware timers (Timer0/1/2) with PWM, CTC, and overflow interrupts
+- 10-bit ADC, full USART0 (TX/RX), SPI, I2C
+- RP2040 dual-core ARM Cortex-M0+ via rp2040js
+- RISC-V RV32IMC (ESP32-C3) emulation via QEMU lcgamboa
+
+## ATmega328P Simulator
+Simulate ATmega328P firmware exactly as it runs on Arduino Uno and Nano. Full AVR8 emulation: PORTB, PORTC, PORTD, Timer0/1/2, ADC, USART0, and all interrupt vectors. [Open ATmega328P Simulator →](http://localhost:5174/atmega328p-simulator)
+- ATmega328P: 32 KB flash, 2 KB SRAM, 16 MHz
+- GPIO: PORTB (pins 8–13), PORTC (A0–A5), PORTD (0–7)
+- Timer0 (8-bit), Timer1 (16-bit), Timer2 (8-bit) — all PWM modes
+- 10-bit ADC, 6 analog channels (A0–A5)
+- USART0 with configurable baud rate
+
+## Arduino Mega 2560 Simulator
+
+Simulate Arduino Mega 2560 (ATmega2560) code for free. 256 KB flash, 54 digital pins, 16 analog inputs, 4 hardware serial ports (Serial, Serial1, Serial2, Serial3), and 6 hardware timers. [Open Mega 2560 Simulator →](http://localhost:5174/arduino-mega-simulator)
+- ATmega2560: 256 KB flash, 8 KB SRAM, 16 MHz
+- 54 digital I/O pins (PORTA through PORTL)
+- 16 analog input channels (A0–A15), 10-bit ADC
+- 4 hardware USART channels: Serial0–3
+- 6 hardware timers: Timer0–5 (including three 16-bit)
+- 15 PWM output pins

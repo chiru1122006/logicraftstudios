@@ -1,0 +1,87 @@
+.gh-star-banner {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9999;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--wb-1);
+  border: 1px solid var(--wb-6);
+  border-radius: 12px;
+  padding: 16px 18px;
+  width: 320px;
+  box-shadow: var(--shadow-3);
+  animation: gh-banner-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes gh-banner-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.gh-star-banner__icon {
+  color: var(--color-feedback-warning);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.gh-star-banner__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.gh-star-banner__body strong {
+  display: block;
+  color: var(--wb-13);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.gh-star-banner__body p {
+  color: var(--wb-10);
+  font-size: 12.5px;
+  line-height: 1.45;
+  margin: 0 0 12px;
+}
+
+.gh-star-banner__btn {
+  display: inline-block;
+  background: var(--color-feedback-warning);
+  color: #1b1f23;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.15s ease;
+  letter-spacing: 0.01em;
+}
+
+.gh-star-banner__btn:hover {
+  background: var(--color-feedback-warning);
+}
+
+.gh-star-banner__close {
+  background: none;
+  border: none;
+  color: var(--wb-10);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: color 0.15s ease;
+}
+
+.gh-star-banner__close:hover {
+  color: var(--wb-13);
+}

@@ -1,0 +1,682 @@
+.simulator-canvas-container {
+  display: flex;
+  height: 100%;
+  position: relative;
+}
+
+.simulator-canvas {
+  flex: 1;
+  background-color: var(--wb-1);
+  color: var(--wb-13);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Canvas header ───────────────────────────────── */
+.canvas-header {
+  height: 46px;
+  padding: 0 12px;
+  background: var(--wb-3);
+  border-bottom: 1px solid var(--wb-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+/* When portaled into the unified top toolbar, drop the standalone chrome
+   (border + background) and shrink to match the editor toolbar height so
+   the two halves read as a single bar. Also drop space-between so the
+   left/right groups sit adjacent to each other inside the slot. */
+.canvas-header--portaled {
+  height: 38px;
+  padding: 0 8px;
+  background: transparent;
+  border-bottom: none;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.canvas-header-left,
+.canvas-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Status LED dot ──────────────────────────────── */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition:
+    background 0.3s,
+    box-shadow 0.3s;
+}
+
+.status-dot.running {
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+  animation: pulse-green 2s ease-in-out infinite;
+}
+
+.status-dot.stopped {
+  background: var(--wb-8);
+  box-shadow: none;
+}
+
+@keyframes pulse-green {
+  0%,
+  100% {
+    box-shadow: 0 0 4px rgba(16, 185, 129, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.95);
+  }
+}
+
+/* ── Board Selector ──────────────────────────────── */
+.board-selector {
+  padding: 5px 24px 5px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--wb-13);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease-out;
+  height: 30px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+.board-selector:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.15);
+}
+
+.board-selector:focus {
+  outline: none;
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+}
+
+.board-selector:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Camera / Microphone toggles ───────────────────── */
+.canvas-cam-mic-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  height: 30px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--wb-11);
+  transition: all 0.15s ease-out;
+}
+
+.canvas-cam-mic-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+/* ── Serial Monitor button ───────────────────────── */
+.canvas-serial-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 7px;
+  color: var(--wb-11);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease-out;
+  white-space: nowrap;
+}
+
+.canvas-serial-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.canvas-serial-btn-active {
+  background: rgba(14, 165, 233, 0.15);
+  border-color: #38bdf8;
+  color: #38bdf8;
+  box-shadow: 0 0 12px rgba(14, 165, 233, 0.25);
+}
+
+/* ── Canvas icon-only buttons (undo/redo, …) ─────── */
+.canvas-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 7px;
+  color: var(--wb-11);
+  cursor: pointer;
+  transition: all 0.15s ease-out;
+  flex-shrink: 0;
+}
+
+.canvas-icon-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.canvas-icon-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ── Component count ─────────────────────────────── */
+.component-count {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--wb-10);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+/* ── Add Component button ────────────────────────── */
+.add-component-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  height: 30px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  box-shadow: 0 0 14px rgba(14, 165, 233, 0.35);
+}
+
+.add-component-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.55);
+  transform: translateY(-1px);
+}
+
+.add-component-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 0 8px rgba(14, 165, 233, 0.3);
+}
+
+.add-component-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ── Canvas content (viewport) ───────────────────── */
+.canvas-content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--wb-1);
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 19px,
+      var(--color-canvas-grid) 19px,
+      var(--color-canvas-grid) 20px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 19px,
+      var(--color-canvas-grid) 19px,
+      var(--color-canvas-grid) 20px
+    );
+  user-select: none;
+  touch-action: none; /* Disable browser scroll/zoom so JS handlers take full control */
+}
+
+/* ── Infinite canvas world ───────────────────────── */
+.canvas-world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  width: 4000px;
+  height: 3000px;
+}
+
+/* ── Components area ─────────────────────────────── */
+.components-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Hit-test transparent: this full-canvas div sits later in the DOM than
+     the boards, so with pointer events it would swallow clicks meant for
+     board pins / board drag overlays (their z-index is local to each
+     board's stacking context). Component groups re-enable their own. */
+  pointer-events: none;
+}
+
+/* ── Zoom controls ───────────────────────────────── */
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 8px;
+  padding: 0 4px;
+  height: 30px;
+}
+
+/* Floating variant: pinned to the canvas' bottom-right corner.
+   Sits above the canvas layers; dialogs/modals portal to <body>. */
+.zoom-controls--floating {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 60;
+  height: 34px;
+  padding: 0 6px;
+  background: rgba(12, 12, 16, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+  border-radius: 10px;
+}
+
+.zoom-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--wb-11);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease-out;
+}
+
+.zoom-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.zoom-level {
+  min-width: 44px;
+  text-align: center;
+  background: transparent;
+  border: none;
+  color: var(--wb-11);
+  font-size: 11px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0 4px;
+  border-radius: 4px;
+  transition: all 0.15s ease-out;
+}
+
+.zoom-level:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.component-label {
+  font-size: 11px;
+  background-color: rgba(14, 14, 19, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  margin-top: 5px;
+  text-align: center;
+  color: var(--wb-12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Wire creation mode banner ──────────────────── */
+.wire-mode-banner {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  background: rgba(14, 165, 233, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 8px 32px rgba(14, 165, 233, 0.35);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  white-space: nowrap;
+  pointer-events: auto;
+}
+
+.wire-mode-banner button {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--wb-13);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 4px;
+  padding: 4px 14px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.wire-mode-banner button:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* ── Mobile-friendly adjustments ────────────────── */
+@media (max-width: 768px) {
+  .canvas-header {
+    height: 42px;
+    padding: 0 6px;
+  }
+
+  .canvas-header-left,
+  .canvas-header-right {
+    gap: 4px;
+  }
+
+  .canvas-serial-btn {
+    padding: 0 6px;
+    font-size: 0; /* hide text, show icon only */
+  }
+
+  .canvas-serial-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .canvas-cam-mic-btn {
+    padding: 0 6px;
+    gap: 0;
+    font-size: 0; /* icon-only on narrow viewports too */
+  }
+
+  .add-component-btn {
+    padding: 0 8px;
+    font-size: 0; /* hide text, show icon only */
+  }
+
+  .add-component-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .board-selector {
+    font-size: 11px;
+    max-width: 90px;
+    padding: 4px 20px 4px 6px;
+  }
+
+  .zoom-controls {
+    display: none; /* Use pinch-to-zoom on mobile */
+  }
+
+  .component-count {
+    display: none;
+  }
+
+  .wire-mode-banner {
+    font-size: 12px;
+    padding: 6px 12px;
+    gap: 8px;
+    bottom: 8px;
+  }
+}
+
+/* ── Narrow shared toolbar (desktop, AI chat open) ────────────────────────
+   When the canvas header is portaled into the unified top toolbar, it shares
+   one row with the editor actions. As that *bar* narrows (mainly when the
+   right-docked AI chat opens), collapse the canvas controls the same way the
+   mobile block does — but keyed to the bar's own width via a container query,
+   not the viewport, so it triggers on a wide screen with the chat open too.
+   Priority: labels -> icons, then drop the non-interactive count, then the
+   zoom buttons (mouse-wheel zoom still works). The finer tiers below stay
+   keyed to the bar's width; the FIRST tier (labels -> icons) is instead the
+   `unified-toolbar--compact` class, which AppHeader sets when it MEASURES
+   that the labelled strip does not fit the row it is on (headerStripFit.ts)
+   — a fixed 1010px threshold was right for one board's set of controls
+   only: a XIAO with camera + mic + scope kept its labels at 1060px and
+   wrapped the bar into two rows. */
+.unified-toolbar.unified-toolbar--compact .canvas-header-left,
+.unified-toolbar.unified-toolbar--compact .canvas-header-right {
+  /* Pack the toolbar buttons tighter once the AI chat steals horizontal
+     room, so Serial/Camera/Mic/Scope stop overlapping. */
+  gap: 4px;
+}
+.unified-toolbar.unified-toolbar--compact .canvas-serial-btn {
+  padding: 0 8px;
+  font-size: 0; /* hide "Serial" / "Scope" text, keep the icon */
+}
+.unified-toolbar.unified-toolbar--compact .canvas-serial-btn svg {
+  width: 18px;
+  height: 18px;
+}
+/* Same collapse as Serial: hide the "Camera" / "Mic" label, keep the icon.
+   gap: 0 drops the now-empty icon-to-label space. */
+.unified-toolbar.unified-toolbar--compact .canvas-cam-mic-btn {
+  padding: 0 8px;
+  gap: 0;
+  font-size: 0;
+}
+.unified-toolbar.unified-toolbar--compact .add-component-btn {
+  padding: 0 9px;
+  font-size: 0; /* hide "Add" text, keep the icon */
+}
+.unified-toolbar.unified-toolbar--compact .add-component-btn svg {
+  width: 18px;
+  height: 18px;
+}
+.unified-toolbar.unified-toolbar--compact .board-selector {
+  /* 88px still shows enough of "ESP32 DevKit…" to tell boards apart, and the
+     full name is one hover away in the select itself. The 32px this gives
+     back is 32px of not wrapping the whole bar onto a second row. */
+  max-width: 88px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* The component count is the first thing to go when the row is tight: it is
+   a number you can also read on the canvas, and it costs 24px next to the
+   controls you actually press. */
+.unified-toolbar.unified-toolbar--compact .component-count {
+  display: none;
+}
+@container unified-toolbar (max-width: 905px) {
+  .component-count {
+    display: none;
+  }
+  .board-selector {
+    max-width: 96px;
+  }
+}
+@container unified-toolbar (max-width: 835px) {
+  .zoom-controls {
+    display: none; /* mouse-wheel / trackpad zoom still available */
+  }
+}
+
+/* ── WiFi / BLE status badges ─────────────────────────────────────────── */
+.canvas-wifi-badge,
+.canvas-ble-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: default;
+  vertical-align: middle;
+}
+
+.canvas-wifi-badge svg,
+.canvas-ble-badge svg {
+  display: block;
+}
+
+/* WiFi status colours */
+.canvas-wifi-initializing {
+  color: var(--color-feedback-warning);
+}
+.canvas-wifi-connected {
+  color: var(--color-feedback-warning);
+}
+.canvas-wifi-got_ip {
+  color: var(--color-feedback-success);
+}
+.canvas-wifi-disconnected {
+  color: var(--wb-9);
+}
+
+.canvas-wifi-clickable {
+  cursor: pointer !important;
+  transition:
+    transform 0.2s,
+    filter 0.2s;
+}
+
+.canvas-wifi-clickable:hover {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 5px currentColor);
+}
+
+.canvas-wifi-clickable:active {
+  transform: scale(0.95);
+}
+
+/* BLE status colours */
+.canvas-ble-initialized {
+  color: var(--color-action-primary);
+}
+.canvas-ble-advertising {
+  color: #6366f1;
+}
+
+/* ── Selection action bar (floating toolbar for selected wire/component/board) ─── */
+.selection-action-bar button:hover {
+  background: var(--wb-4) !important;
+  border-color: var(--wb-7) !important;
+}
+.selection-action-bar button:active {
+  transform: scale(0.97);
+}
+.selection-action-bar button:focus-visible {
+  outline: 2px solid var(--color-action-primary);
+  outline-offset: 1px;
+}
+
+/* Hide button labels on narrow viewports — keep just the icons */
+@media (max-width: 520px) {
+  .selection-action-bar .selection-action-bar__label {
+    display: none;
+  }
+}
+
+/* Runtime burnout (P4): a component destroyed mid-simulation renders charred,
+   with a red dashed outline + a smoke badge (the badge is a sibling of the
+   container, so it stays full-colour). Cleared on Reset. */
+.velxio-burnt .web-component-container {
+  filter: grayscale(0.85) brightness(0.4) sepia(0.5) contrast(1.15);
+  transition: filter 0.25s ease;
+}
+.velxio-burnt {
+  outline: 1px dashed rgba(220, 38, 38, 0.65);
+  outline-offset: 1px;
+  border-radius: 4px;
+}
+
+/* Selected component: marching ants.
+   A newly added part lands in a corner of the viewport and the previous
+   flat dashed border was easy to miss on a busy canvas — a moving outline
+   is what the eye actually catches. Drawn on a pseudo-element just OUTSIDE
+   the body so it never covers the artwork, and pointer-events: none so it
+   never steals a click or a pin.
+
+   Animating a dashed border is not possible (dash offset is not an
+   animatable property), hence the four gradient edges with a moving
+   background-position — the standard recipe. */
+.velxio-ants::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 5px;
+  pointer-events: none;
+  z-index: 6;
+  background-image:
+    linear-gradient(90deg, var(--ant-color) 50%, transparent 0),
+    linear-gradient(90deg, var(--ant-color) 50%, transparent 0),
+    linear-gradient(0deg, var(--ant-color) 50%, transparent 0),
+    linear-gradient(0deg, var(--ant-color) 50%, transparent 0);
+  background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+  background-size: 10px 2px, 10px 2px, 2px 10px, 2px 10px;
+  background-position: 0 0, 0 100%, 0 0, 100% 0;
+  animation: velxio-ants 0.55s linear infinite;
+}
+
+.velxio-ants {
+  --ant-color: var(--color-accent-fg);
+}
+
+@keyframes velxio-ants {
+  to {
+    background-position: 10px 0, -10px 100%, 0 -10px, 100% 10px;
+  }
+}
+
+/* Respect the OS setting: the outline still marks the selection, it just
+   stops moving. */
+@media (prefers-reduced-motion: reduce) {
+  .velxio-ants::after {
+    animation: none;
+  }
+}

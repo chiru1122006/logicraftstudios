@@ -1,0 +1,18 @@
+# One group, no blank lines inside it: some crawlers treat a blank line as
+# the end of a group, which left the Disallow rules below orphaned.
+User-agent: *
+Allow: /
+# UUID-based duplicate of /:username/:slug (the canonical URL); crawling it
+# is wasted budget.
+Disallow: /project/
+# API endpoints are not pages.
+Disallow: /api/
+# Auth and admin pages are deliberately NOT disallowed here: they carry a
+# noindex meta tag, and a page has to be crawlable for that tag to be seen —
+# a disallowed URL can still be indexed from links, title-less.
+
+# Sitemaps (static build-time routes + dynamic public projects + the docs
+# portal, which is a separate Astro build shipping its own sitemap index)
+Sitemap: https://logicraftstudios.tech/sitemap.xml
+Sitemap: https://logicraftstudios.tech/sitemap-projects.xml
+Sitemap: https://logicraftstudios.tech/docs/sitemap-index.xml

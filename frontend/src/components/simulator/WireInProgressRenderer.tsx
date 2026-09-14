@@ -1,0 +1,93 @@
+/**
+ * WireInProgressRenderer — live preview while drawing a wire.
+ * Shows the fixed waypoints + a dynamic elbow segment to the mouse cursor.
+ */
+
+import React from 'react';
+import type { WireInProgress } from '../../types/wire';
+import { generatePreviewPath, generateOrthogonalPath } from '../../utils/wireUtils';
+import { cssVar } from '../../lib/theme';
+
+interface Props {
+  wireInProgress: WireInProgress;
+}
+
+export const WireInProgressRenderer: React.FC<Props> = ({ wireInProgress }) => {
+  const { startEndpoint, waypoints, color, currentX, currentY, routedPreview } = wireInProgress;
+
+  // Prefer the live auto-route (dodges components and existing wires) when
+  // the store computed one; hand-guided previews (user waypoints) and the
+  // "direct elbow is already clean" case fall through to the classic path.
+  const path =
+    routedPreview && waypoints.length === 0
+      ? generateOrthogonalPath(
+          { x: startEndpoint.x, y: startEndpoint.y },
+          routedPreview,
+          { x: currentX, y: currentY },
+        )
+      : generatePreviewPath(
+          { x: startEndpoint.x, y: startEndpoint.y },
+          waypoints,
+          currentX,
+          currentY,
+        );
+
+  if (!path) return null;
+
+  const isBlackWire =
+    !color ||
+    color === 'black' ||
+    color === '#000000' ||
+    color === '#000' ||
+    color === '#111111' ||
+    color?.toLowerCase?.() === 'black' ||
+    color === 'rgb(0,0,0)' ||
+    color === 'rgba(0,0,0,1)';
+  const effectiveOutline = isBlackWire ? 'rgba(255, 255, 255, 0.45)' : cssVar('--color-wire-outline');
+
+  return (
+    <g className="wire-in-progress" style={{ pointerEvents: 'none' }}>
+      {/* Dark/contrast outline */}
+      <path d={path} stroke={effectiveOutline} strokeWidth="5" fill="none" />
+
+      {/* Colored wire */}
+      <path d={path} stroke={color} strokeWidth="2" fill="none" />
+
+      {/* Dashed overlay to indicate "in progress" */}
+      <path
+        d={path}
+        stroke={cssVar('--color-wire-marker')}
+        strokeWidth="1.5"
+        fill="none"
+        strokeDasharray="6,4"
+        opacity="0.5"
+      />
+
+      {/* Start pin marker */}
+      <circle
+        cx={startEndpoint.x}
+        cy={startEndpoint.y}
+        r="4"
+        fill={color}
+        stroke={cssVar('--color-wire-marker')}
+        strokeWidth="1.5"
+      />
+
+      {/* Waypoint markers (locked-in corners) */}
+      {waypoints.map((wp, i) => (
+        <circle key={i} cx={wp.x} cy={wp.y} r="3" fill={color} stroke={cssVar('--color-wire-marker')} strokeWidth="1" />
+      ))}
+
+      {/* Cursor marker */}
+      <circle
+        cx={currentX}
+        cy={currentY}
+        r="4"
+        fill={color}
+        stroke={cssVar('--color-wire-marker')}
+        strokeWidth="1.5"
+        opacity="0.7"
+      />
+    </g>
+  );
+};

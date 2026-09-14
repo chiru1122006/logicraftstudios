@@ -1,0 +1,40 @@
+# ESP-IDF toolchain image — built once, pulled many times.
+# Published to GHCR by build-espidf-toolchain.yml Action.
+# Usage: docker build -f Dockerfile.espidf-toolchain -t velxio-espidf-toolchain .
+FROM ubuntu:22.04
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git wget flex bison gperf python3 python3-pip python3-venv \
+    cmake ninja-build ccache libffi-dev libssl-dev \
+    libusb-1.0-0 ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# ESP-IDF v5.5.4 + arduino-esp32 3.3.10 — the same pair logicraftstudios.tech builds
+# with. espidf_compiler discovers them at /opt/esp-idf-v5 and
+# /opt/arduino-esp32-3 (overridable via IDF5_PATH / ARDUINO_ESP32_5_PATH) and
+# routes every ESP32-family Arduino build through them (_use_idf5).
+#
+# History: until 2026-08 this stage pinned IDF 4.4.7 + core 2.0.17 because
+# the original qemu-8.1.3 WiFi shim crashed on IDF 5.x cache handling. The
+# current libqemu builds run IDF 5.x firmware, and logicraftstudios.tech moved to the
+# 3.x core; shipping 2.0.17 here meant sketches written on logicraftstudios.tech
+# (ledcAttach, esp_now_recv_info_t, the esp_task_wdt config API, ...) did
+# not compile on a self-hosted image.
+RUN git clone -b v5.5.4 --recursive --depth=1 --shallow-submodules \
+    https://github.com/espressif/esp-idf.git /opt/esp-idf-v5
+
+WORKDIR /opt/esp-idf-v5
+
+# Every family toolchain. Classic-ESP32 builds need the v5.5 xtensa toolchain
+# too: with only the RISC-V targets installed they silently pick whatever GCC
+# is on PATH and die mid-build on newlib header mismatches.
+RUN ./install.sh esp32,esp32s3,esp32c3,esp32c6
+
+# Clean up large unnecessary files to reduce image size
+RUN rm -rf .git docs examples \
+    && find /root/.espressif -name '*.tar.*' -delete 2>/dev/null || true
+
+# Arduino-as-component (3.x core, IDF 5.5 based) for full Arduino API support
+RUN git clone --branch 3.3.10 --depth=1 --recursive --shallow-submodules \
+    https://github.com/espressif/arduino-esp32.git /opt/arduino-esp32-3 \
+ && rm -rf /opt/arduino-esp32-3/.git

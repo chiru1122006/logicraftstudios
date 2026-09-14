@@ -1,0 +1,220 @@
+/* NewProjectDialog — starter-template picker (dark, matches the picker/modals) */
+
+.new-project-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-bg-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Above every floating panel, including the pro AI chat (8000/8001). */
+  z-index: 9000;
+  animation: newProjectFadeIn 0.15s ease;
+}
+
+@keyframes newProjectFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.new-project-dialog {
+  background: #0c0c11;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  width: min(840px, 94vw);
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.95);
+}
+
+.new-project-head {
+  padding: 20px 26px 14px;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background: #09090d;
+}
+
+.new-project-head-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.new-project-brand-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.new-project-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+
+.new-project-sub {
+  margin: 6px 0 0;
+  color: var(--wb-10);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.new-project-body {
+  padding: 12px 26px 20px;
+  overflow-y: auto;
+}
+
+.new-project-section-title {
+  margin: 16px 0 8px;
+  color: var(--wb-10);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.new-project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(178px, 1fr));
+  gap: 10px;
+}
+
+.new-project-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 0;
+  overflow: hidden;
+  color: var(--wb-13);
+  cursor: pointer;
+  font: inherit;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.new-project-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(56, 189, 248, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+/* Circuit thumbnail — same 300x180 (5:3) frame as the gallery cards. */
+.new-project-card-thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 5 / 3;
+  background: #07070a;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.new-project-card-thumb img,
+.new-project-card-thumb svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.new-project-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 11px 10px;
+}
+
+.new-project-card-blank {
+  border-style: dashed;
+  border-color: rgba(255, 255, 255, 0.15);
+  margin-top: 12px;
+}
+
+.new-project-card-blank:hover {
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.05);
+}
+
+.new-project-card-thumb-blank {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+  font-weight: 300;
+  color: #38bdf8;
+  background: transparent;
+}
+
+.new-project-card-name {
+  font-weight: 600;
+  font-size: 12.5px;
+  color: #ffffff;
+}
+
+.new-project-card-desc {
+  color: var(--wb-10);
+  font-size: 11px;
+  line-height: 1.35;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Gold PRO pill — same look as the component picker's badge. */
+.new-project-pro {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: #1a1205;
+  background: linear-gradient(180deg, #ffd566, #f5a623);
+  box-shadow: var(--shadow-1);
+}
+
+.new-project-foot {
+  padding: 14px 26px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  background: #09090d;
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.new-project-cancel {
+  padding: 7px 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--wb-11);
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.new-project-cancel:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}

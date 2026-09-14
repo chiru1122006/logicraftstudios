@@ -1,0 +1,473 @@
+name: Discord — Release Merge Notification
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - release
+  # Manual re-fire (e.g. to retry a failed announce without a new merge).
+  # Uses THIS file from the dispatched ref; checks out `release` and announces
+  # whatever version release's frontend/package.json holds.
+  workflow_dispatch:
+    inputs:
+      base:
+        description: 'Base git ref/SHA to diff from (commits base..HEAD are summarised). Defaults to HEAD~50.'
+        required: false
+        default: ''
+
+jobs:
+  notify:
+    # Run on a merged PR into release, or on a manual dispatch.
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # necesario para pushear CHANGELOG.md + version bump
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: release
+
+      - name: Configure git identity
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Announce on Discord, then commit CHANGELOG + version bump on success
+        uses: actions/github-script@v7
+        env:
+          # Same relay the Velxio agent uses for paid accounts: the operator's
+          # 9router combo, which balances across their provider accounts and
+          # absorbs the upstream cost. Base URL + key are secrets so nothing
+          # about the relay is published in this repo; with either unset the
+          # script falls back to calling DeepSeek directly.
+          NINEROUTER_BASE_URL: ${{ secrets.NINEROUTER_BASE_URL }}
+          NINEROUTER_API_KEY:  ${{ secrets.NINEROUTER_API_KEY }}
+          NINEROUTER_MODEL:    ${{ vars.NINEROUTER_MODEL_PAID || 'velxio-pro' }}
+          DAVEAGENT_API_KEY:   ${{ secrets.DAVEAGENT_API_KEY }}
+          DISCORD_BOT_TOKEN:   ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_CHANNEL_ID:  ${{ secrets.DISCORD_CHANNEL_ID }}
+        with:
+          script: |
+            const { execSync } = require('child_process');
+            const fs = require('fs');
+            const today = new Date().toISOString().slice(0, 10);
+
+            // ── Helpers ──────────────────────────────────────────────────────
+            function git(cmd) {
+              try {
+                return execSync(`git ${cmd}`, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
+              } catch { return ''; }
+            }
+
+            // deepseek-v4-flash is a REASONING model: max_tokens caps the
+            // reasoning trace + the visible answer TOGETHER, so a stingy budget
+            // makes `content` come back empty (which once made us POST an empty
+            // Discord message, and once killed the v3.0.2 announce outright).
+            // Give it generous budgets, and retry with double when the model
+            // spends the whole budget reasoning.
+            // 9router returns an OpenAI-shaped body, except some of the
+            // upstreams its combo rotates to append a literal `data: [DONE]`
+            // to the NON-streaming response. A plain res.json() throws "Extra
+            // data" on those and a perfectly good 200 looks like a broken
+            // relay (that cost the pro agent 378 fallbacks in one day before
+            // it was understood). Parse the same way app/pro's
+            // parse_openai_body does.
+            function parseOpenAiBody(text) {
+              const raw = (text || '').trim();
+              try { return JSON.parse(raw); } catch {}
+              const brace = raw.indexOf('{');
+              if (brace >= 0) {
+                const head = raw.slice(brace, raw.lastIndexOf('}') + 1);
+                try { return JSON.parse(head); } catch {}
+              }
+              let best = null;
+              for (const line of raw.split('\n')) {
+                if (!line.startsWith('data: ')) continue;
+                const chunk = line.slice(6).trim();
+                if (!chunk || chunk === '[DONE]') continue;
+                try { const obj = JSON.parse(chunk); if (obj && typeof obj === 'object') best = obj; } catch {}
+              }
+              if (best) return best;
+              throw new Error('no JSON object in the response body');
+            }
+
+            // Tier 1: the relay the agent gives paid accounts. Skipped when
+            // the operator has not configured it.
+            async function nineRouterRequest(prompt, maxTokens, temperature) {
+              const base = (process.env.NINEROUTER_BASE_URL || '').trim().replace(/\/$/, '');
+              if (!base) return null;
+              const key = (process.env.NINEROUTER_API_KEY || '').trim();
+              const model = (process.env.NINEROUTER_MODEL || 'velxio-pro').trim();
+              const headers = { 'Content-Type': 'application/json' };
+              if (key) headers['Authorization'] = `Bearer ${key}`;
+              const res = await fetch(`${base}/chat/completions`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({
+                  model,
+                  max_tokens: maxTokens,
+                  temperature,
+                  messages: [{ role: 'user', content: prompt }],
+                }),
+              });
+              const text = await res.text();
+              if (!res.ok) throw new Error(`9router ${res.status}: ${text.slice(0, 300)}`);
+              const data = parseOpenAiBody(text);
+              const choice = data.choices?.[0] ?? {};
+              console.log(
+                `9router(${model}): upstream=${data.model ?? '?'} finish_reason=${choice.finish_reason} ` +
+                `completion_tokens=${data.usage?.completion_tokens ?? '?'}`
+              );
+              return (choice.message?.content ?? '').trim();
+            }
+
+            async function deepSeekRequest(prompt, maxTokens, temperature) {
+              const apiKey = process.env.DAVEAGENT_API_KEY;
+              if (!apiKey) throw new Error('DAVEAGENT_API_KEY not set');
+              const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${apiKey}`,
+                },
+                body: JSON.stringify({
+                  model: 'deepseek-v4-flash',
+                  max_tokens: maxTokens,
+                  temperature,
+                  messages: [{ role: 'user', content: prompt }],
+                }),
+              });
+              if (!res.ok) {
+                const err = await res.text();
+                throw new Error(`DeepSeek ${res.status}: ${err}`);
+              }
+              const data = await res.json();
+              const choice = data.choices?.[0] ?? {};
+              console.log(
+                `DeepSeek: max_tokens=${maxTokens} finish_reason=${choice.finish_reason} ` +
+                `completion_tokens=${data.usage?.completion_tokens ?? '?'}`
+              );
+              return (choice.message?.content ?? '').trim();
+            }
+
+            // 9router first (that is where paid agent traffic goes), DeepSeek
+            // direct as the fallback -- the same order routes.agent.py uses.
+            // A dead DeepSeek balance is exactly what killed the v3.0.4
+            // announce (402 Insufficient Balance, 2026-08-25), so a single
+            // provider must not be able to block a release again.
+            async function askModel(prompt, maxTokens, temperature) {
+              try {
+                const viaRelay = await nineRouterRequest(prompt, maxTokens, temperature);
+                if (viaRelay) return viaRelay;
+                if (viaRelay === '') console.log('9router returned empty content — trying DeepSeek');
+              } catch (e) {
+                console.log(`9router failed (${e.message}) — falling back to DeepSeek`);
+              }
+              return deepSeekRequest(prompt, maxTokens, temperature);
+            }
+
+            async function callDeepSeek(prompt, maxTokens, temperature = 0.3) {
+              let content = await askModel(prompt, maxTokens, temperature);
+              if (!content) {
+                console.log('Empty content — retrying once with double the token budget');
+                content = await askModel(prompt, maxTokens * 2, temperature);
+              }
+              return content;
+            }
+
+            // ── Version (read from release's package.json) ────────────────────
+            let version = '3.0.0';
+            try {
+              const pkg = JSON.parse(fs.readFileSync('frontend/package.json', 'utf8'));
+              version = pkg.version ?? '3.0.0';
+            } catch {}
+            function bumpPatch(v) {
+              const m = String(v).match(/^(\d+)\.(\d+)\.(\d+)/);
+              if (!m) return v;
+              return `${m[1]}.${m[2]}.${Number(m[3]) + 1}`;
+            }
+            const nextVersion = bumpPatch(version);
+            console.log(`Version: v${version}  ->  next: v${nextVersion}`);
+
+            // ── Commit range + metadata (pull_request OR manual dispatch) ─────
+            let baseSha, headSha, sourceBranch, prTitle, prBody, prNumber;
+            if (context.eventName === 'pull_request') {
+              const pr = context.payload.pull_request;
+              baseSha = pr.base.sha;      // release tip BEFORE the merge
+              headSha = pr.head.sha;      // source branch tip (master)
+              sourceBranch = pr.head.ref;
+              prTitle = pr.title ?? '';
+              prBody  = pr.body  ?? '';
+              prNumber = pr.number;
+            } else {
+              headSha = git('rev-parse HEAD');
+              const inputBase = (context.payload.inputs && context.payload.inputs.base || '').trim();
+              baseSha = inputBase || git('rev-parse HEAD~50') || headSha;
+              sourceBranch = 'release';
+              prTitle = `Release v${version}`;
+              prBody  = '';
+              prNumber = 'manual';
+            }
+            console.log(`Event: ${context.eventName}  PR: #${prNumber} "${prTitle}"`);
+            console.log(`Range: ${baseSha.slice(0,7)}..${headSha.slice(0,7)} (${sourceBranch} → release)`);
+
+            // Full detail (subject + BODY + author) reads best for a small
+            // release, but a 45-commit range blows the prompt up and the model
+            // burns its whole budget reasoning over it. Past the threshold,
+            // drop the bodies and send subjects only.
+            const MAX_COMMIT_CHARS = 8000;
+            const commitsFull = git(
+              `log ${baseSha}..${headSha} --pretty=format:"%h||%s||%b||%an|||" --no-merges`
+            ) || git(`log -50 --pretty=format:"%h||%s||%b||%an|||" --no-merges`);
+            const commitLines = git(
+              `log ${baseSha}..${headSha} --pretty=format:"%h %s" --no-merges`
+            ) || git(`log -50 --pretty=format:"%h %s" --no-merges`);
+            const commitCount = commitLines.split('\n').filter(Boolean).length;
+            const compact = commitsFull.length > MAX_COMMIT_CHARS;
+            // Subjects alone can still be huge on a monster range — hard cap.
+            const commits = (compact ? commitLines : commitsFull).slice(0, 4 * MAX_COMMIT_CHARS);
+            const changedFiles = git(`diff --name-only ${baseSha}..${headSha}`)
+              .split('\n').filter(Boolean);
+            console.log(
+              `Commits found: ${commitCount} — sending ${compact ? 'SUBJECTS ONLY' : 'full detail'} ` +
+              `(${commits.length} chars, full detail would be ${commitsFull.length})`
+            );
+            console.log(`Files changed: ${changedFiles.length}`);
+
+            // ──────────────────────────────────────────────────────────────────
+            // PHASE 1 — Generate the CHANGELOG entry (in memory only).
+            // ──────────────────────────────────────────────────────────────────
+            const changelogPrompt = `You are generating a CHANGELOG entry for version ${version} of Velxio.
+
+            Velxio is a fully local, open-source Arduino/RP2040 emulator and circuit simulator.
+
+            PR TITLE: ${prTitle}
+            PR DESCRIPTION: ${prBody}
+            SOURCE BRANCH: ${sourceBranch}
+
+            GIT COMMITS (${compact ? 'hash subject' : 'hash||subject||body||author'}):
+            ${commits}
+
+            Generate a changelog entry using EXACTLY this format:
+
+            ## [${version}] - ${today}
+
+            ### Added
+            - New user-facing features
+
+            ### Changed
+            - Changes in existing functionality
+
+            ### Fixed
+            - Bug fixes
+
+            RULES:
+            1. Group commits by category (Added, Changed, Fixed, Performance, Removed, Security)
+            2. Write in past tense, user-facing language
+            3. Skip trivial commits (formatting, typos, version bumps)
+            4. Combine related commits into single entries
+            5. Remove commit hashes and author names
+            6. Only include sections that have real content
+            7. Output ONLY the changelog entry block, nothing else`;
+
+            console.log(`Generating CHANGELOG entry... (prompt: ${changelogPrompt.length} chars)`);
+            // 16000 was measured to still hit finish_reason=length (all of it
+            // spent reasoning, empty content) on a 45-commit range. 32000 lands
+            // comfortably; the retry doubles to 64000, which the API accepts.
+            const changelogEntry = await callDeepSeek(changelogPrompt, 32000, 0.3);
+            if (!changelogEntry) {
+              core.setFailed('CHANGELOG generation returned empty content — aborting before any side effects');
+              return;
+            }
+
+            // ──────────────────────────────────────────────────────────────────
+            // PHASE 2 — Generate the Discord announcement (in memory only).
+            // ──────────────────────────────────────────────────────────────────
+            const announcementPrompt = `You are writing a Discord announcement for Velxio v${version}.
+
+            Velxio is a fully local, open-source Arduino/RP2040 emulator and circuit simulator that runs in the browser.
+            Website: https://logicraftstudios.tech/
+            GitHub: https://github.com/chiru1122006/velxio
+
+            CRITICAL: The announcement MUST be 1900 characters or less.
+
+            CHANGELOG for this version (use this as the source of truth):
+            ${changelogEntry}
+
+            RECENT COMMITS (for additional context):
+            ${commitLines.slice(0, MAX_COMMIT_CHARS)}
+
+            STYLE EXAMPLES:
+
+            EXAMPLE 1:
+            v2.0.0 @everyone
+
+            Velxio just got a major upgrade. Here is what is new.
+
+            GROUND CHECK FOR LEDS
+            LEDs now require a proper cathode connection to GND. No more phantom lights without a complete circuit.
+
+            GENERIC OUTPUT COMPONENT PROTECTION
+            Any output component connected without a ground wire stays off. The simulator now enforces real circuit behavior for all components.
+
+            SSD1306 SPI MODE
+            The SSD1306 OLED display now supports both I2C and SPI. Switch protocols from the component property dialog.
+
+            Try it now: https://logicraftstudios.tech/
+            Full release details: https://github.com/chiru1122006/velxio/releases/tag/v2.0.0
+
+            EXAMPLE 2:
+            v2.0.1 @everyone
+
+            Quick fixes in this update:
+
+            Fixed LED staying on after simulation stops
+            Fixed wire color not persisting on reload
+            Fixed serial monitor scroll position resetting mid-output
+
+            Update your Docker image or open https://logicraftstudios.tech/
+
+            STYLE RULES:
+            - Start with version number and @everyone on the first line
+            - No emojis
+            - No markdown (no **, no ###)
+            - Use ALL CAPS for section headers when grouping multiple features
+            - Focus on USER BENEFITS, not implementation details
+            - Under 1900 characters
+            - End with link to GitHub release
+            - Write in English`;
+
+            console.log('Generating Discord announcement...');
+            let announcement = await callDeepSeek(announcementPrompt, 16000, 0.7);
+
+            // Limpiar markdown residual
+            announcement = announcement
+              .replace(/###/g, '')
+              .replace(/\*\*/g, '')
+              .replace(/__/g, '')
+              .trim();
+
+            // Truncar si excede el limite de Discord
+            if (announcement.length > 1900) {
+              const cut = announcement.lastIndexOf('\n', 1900);
+              announcement = announcement.slice(0, cut > 1200 ? cut : 1900).trim();
+            }
+
+            console.log('='.repeat(70));
+            console.log('DISCORD ANNOUNCEMENT:');
+            console.log('='.repeat(70));
+            console.log(announcement);
+            console.log(`\nCharacters: ${announcement.length}/1900`);
+
+            // Guard: never POST an empty message (Discord 400) and never commit
+            // a version bump for an announcement that did not go out.
+            if (!announcement) {
+              core.setFailed('Announcement generation returned empty content — NOT posting, NOT committing');
+              return;
+            }
+
+            // ──────────────────────────────────────────────────────────────────
+            // PHASE 3 — Send to Discord FIRST. No side effects before this.
+            // ──────────────────────────────────────────────────────────────────
+            const botToken  = process.env.DISCORD_BOT_TOKEN;
+            const channelId = process.env.DISCORD_CHANNEL_ID;
+            if (!botToken || !channelId) {
+              core.setFailed('DISCORD_BOT_TOKEN or DISCORD_CHANNEL_ID secret not configured');
+              return;
+            }
+
+            const discordRes = await fetch(
+              `https://discord.com/api/v10/channels/${channelId}/messages`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type':  'application/json',
+                  'Authorization': `Bot ${botToken}`,
+                },
+                body: JSON.stringify({ content: announcement }),
+              }
+            );
+
+            if (!discordRes.ok) {
+              const err = await discordRes.text();
+              core.setFailed(`Discord ${discordRes.status}: ${err}`);
+              return;
+            }
+            console.log('='.repeat(70));
+            console.log(`Release v${version} announced on Discord`);
+
+            // Create the GitHub Release + tag so the /releases/tag/v${version}
+            // link in the announcement actually resolves (otherwise it 404s).
+            // Tag the released commit; tolerate an already-existing tag.
+            try {
+              await github.rest.repos.createRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag_name: `v${version}`,
+                target_commitish: headSha,
+                name: `v${version}`,
+                body: changelogEntry,
+                draft: false,
+                prerelease: false,
+              });
+              console.log(`GitHub Release v${version} created (tag at ${headSha.slice(0,7)})`);
+            } catch (e) {
+              console.log(`GitHub Release create skipped/failed (non-fatal): ${e.message}`);
+            }
+
+            // ──────────────────────────────────────────────────────────────────
+            // PHASE 4 — Only NOW persist: write CHANGELOG + bump the version.
+            // A failed announce above returns early, so it never advances the
+            // version counter or writes a half-baked CHANGELOG.
+            // ──────────────────────────────────────────────────────────────────
+            const changelogPath = 'CHANGELOG.md';
+            let changelogContent;
+            if (!fs.existsSync(changelogPath)) {
+              changelogContent = '# Changelog\n\n'
+                + 'All notable changes to Velxio will be documented in this file.\n'
+                + 'The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).\n\n'
+                + changelogEntry + '\n\n'
+                + `[${version}]: https://github.com/chiru1122006/velxio/releases/tag/v${version}\n`;
+            } else {
+              const existing = fs.readFileSync(changelogPath, 'utf8');
+              const lines = existing.split('\n');
+              let insertIdx = lines.findIndex(l => l.startsWith('## ['));
+              if (insertIdx === -1) {
+                insertIdx = lines.findIndex((l, i) => i > 3 && l.trim() === '') + 1;
+              }
+              lines.splice(insertIdx, 0, changelogEntry, '');
+              const linkLine = `[${version}]: https://github.com/chiru1122006/velxio/releases/tag/v${version}`;
+              if (!existing.includes(linkLine)) lines.push(linkLine);
+              changelogContent = lines.join('\n');
+            }
+            fs.writeFileSync(changelogPath, changelogContent, 'utf8');
+
+            // Bump the PATCH so the NEXT release announces a fresh version.
+            try {
+              const pkgPath = 'frontend/package.json';
+              const pkgRaw = fs.readFileSync(pkgPath, 'utf8');
+              const bumped = pkgRaw.replace(/("version"\s*:\s*")[^"]+(")/, `$1${nextVersion}$2`);
+              fs.writeFileSync(pkgPath, bumped, 'utf8');
+              console.log(`Bumped frontend/package.json: ${version} -> ${nextVersion}`);
+            } catch (e) {
+              console.log('package.json bump failed:', e.message);
+            }
+
+            try {
+              execSync('git add CHANGELOG.md frontend/package.json', { stdio: 'inherit' });
+              execSync(
+                `git commit -m "chore: release v${version}, bump to v${nextVersion} [skip ci]"`,
+                { stdio: 'inherit' }
+              );
+              execSync('git push origin release', { stdio: 'inherit' });
+              console.log(`CHANGELOG + version bump committed and pushed (next: v${nextVersion})`);
+            } catch (e) {
+              console.log('Nothing to commit or push failed:', e.message);
+            }
+
+            console.log(`PR #${prNumber} | Commits: ${commitLines.split('\n').filter(Boolean).length} | Files: ${changedFiles.length}`);

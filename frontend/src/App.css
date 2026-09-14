@@ -1,0 +1,944 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-bg-canvas);
+  color: var(--color-fg-default);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── App shell ──────────────────────────────────── */
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* ── Header ─────────────────────────────────────── */
+/* ── Header ─────────────────────────────────────── */
+.app-header {
+  background-color: var(--color-bg-header);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border-bottom: 1px solid var(--color-border-default);
+  padding: 0 14px;
+  min-height: 46px;
+  height: auto;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 100;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex-shrink: 0;
+  max-width: 50%;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.header-brand-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.header-brand-logo-img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+}
+
+.header-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.header-title-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.brand-badge-pill {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  padding: 2px 6px;
+  border-radius: 9999px;
+  background: rgba(0, 150, 255, 0.12);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  text-transform: uppercase;
+  line-height: 1.2;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1150px) {
+  .brand-badge-pill {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .header-title-text {
+    max-width: 105px;
+  }
+}
+
+@media (max-width: 600px) {
+  .header-title-text {
+    display: none;
+  }
+}
+
+/* Kept for backward compatibility */
+.examples-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--wb-12);
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--wb-6);
+  transition: all 0.15s ease-out;
+}
+
+.examples-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.05);
+}
+
+/* ── Unified nav links ──────────────────────────── */
+.header-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.header-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  color: var(--wb-10);
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  transition: all 0.15s ease-out;
+  white-space: nowrap;
+}
+
+.header-nav-link:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.header-nav-link-active {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.04);
+}
+
+.header-nav-discord {
+  color: #818cf8;
+}
+
+.header-nav-discord:hover {
+  color: var(--color-accent-fg);
+  background: rgba(114, 137, 218, 0.1);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* Header Account Dropdown */
+.header-account-root {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.header-account-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #e2e8f0;
+  font: 500 13px system-ui, sans-serif;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.header-account-btn:hover,
+.header-account-btn--open {
+  background: rgba(59, 130, 246, 0.18);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #ffffff;
+}
+
+.header-account-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 260px;
+  background: #131722;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  z-index: 999999;
+  backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+}
+
+.header-account-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 6px 8px;
+}
+
+.header-account-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 50%, #8b5cf6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.header-account-meta {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header-account-meta strong {
+  font-size: 13.5px;
+  color: #f8fafc;
+  line-height: 1.2;
+}
+
+.header-account-meta span {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: #38bdf8;
+  margin-top: 2px;
+}
+
+.header-account-meta small {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.2;
+}
+
+.header-account-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 6px 0;
+}
+
+.header-account-gh-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #24292f 0%, #1f2428 100%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  margin-bottom: 6px;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.header-account-gh-link:hover {
+  background: #2ea043;
+  border-color: #2ea043;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.header-account-item-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: #cbd5e1;
+  font-size: 12.5px;
+  text-decoration: none;
+  transition: all 0.12s ease;
+}
+
+.header-account-item-link:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+}
+
+/* Mobile hamburger */
+.header-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.header-hamburger span {
+  display: block;
+  height: 2px;
+  background: var(--wb-11);
+  border-radius: 2px;
+  transition: background 0.15s;
+}
+
+.header-hamburger:hover span {
+  background: var(--wb-13);
+}
+
+/* ── Unified top toolbar (desktop) ───────────────
+   Editor controls + canvas controls share a single full-width row that does
+   NOT reflow when the editor/canvas splitter below is dragged. The canvas
+   side renders into the empty `.unified-toolbar-canvas` slot via a React
+   portal from inside SimulatorCanvas. */
+.unified-toolbar {
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  /* When the row genuinely cannot fit (narrow window + docked chat), wrap
+     the canvas controls onto a second line instead of letting flexbox
+     squeeze fixed blocks below their content — that used to crush the
+     Code/Both/Circuit toggle to a third of its width, clipping two of its
+     buttons into unreachable slivers. Two short rows beat hidden buttons. */
+  flex-wrap: wrap;
+  background: var(--wb-3);
+  border-bottom: 1px solid var(--wb-6);
+  min-height: 38px;
+  /* Query container so every zone (view-mode toggle, editor toolbar, canvas
+     controls) can collapse based on the *shared bar's own width* — which is
+     what shrinks when the right-docked AI chat opens — instead of the viewport
+     width. Prevents the canvas controls (board selector, Serial, Scope) from
+     overlapping the editor Run/Compile buttons on a narrow bar. `layout`
+     containment (implied) does not clip: the overflow/run dropdowns still
+     render below the bar. */
+  container-type: inline-size;
+  container-name: unified-toolbar;
+}
+
+/* Collapse the Code/Both/Circuit labels to icon-only first (biggest fixed
+   block in the bar) as the shared bar narrows. */
+.view-mode-toggle {
+  display: flex;
+}
+
+@container unified-toolbar (max-width: 1140px) {
+  .view-mode-toggle .vm-label {
+    display: none;
+  }
+}
+
+/* Narrow bar (small window with the AI chat docked): drop the explorer /
+   Code / Both / Circuit toggle altogether. Every one of its switches is a
+   checkmarked row in the header's View menu, so nothing is lost — and the
+   ~140px it frees is what keeps the Run group and the canvas controls on
+   one line instead of overlapping. */
+@container unified-toolbar (max-width: 760px) {
+  .view-mode-toggle {
+    display: none;
+  }
+}
+
+.unified-toolbar-editor {
+  flex: 1 1 auto;
+  /* Floor the editor zone at its own content width so it can never shrink
+     *under* its buttons and paint them over the adjacent canvas controls
+     (a hardcoded 280px floor sat below the real content width, letting the
+     console button overlap the board selector with the chat docked). When
+     the row genuinely cannot fit, the bar's flex-wrap moves the canvas
+     controls to a second line instead — never an overlap. */
+  min-width: max-content;
+  display: flex;
+}
+
+.unified-toolbar-editor .editor-toolbar-wrapper,
+.unified-toolbar-editor .editor-toolbar {
+  flex: 1;
+  min-width: 0;
+}
+
+/* The wrapper is an inline-size query container for its standalone (mobile)
+   mount. Inside the shared bar that containment is exactly what let the
+   editor zone shrink under its buttons: size containment makes the wrapper
+   contribute ZERO intrinsic width, so the zone's `min-width: max-content`
+   above resolved to nothing, flexbox squeezed it, and Libraries / Output
+   painted over the board selector instead of the bar wrapping. Turn it off
+   here — the label collapses are keyed to the `unified-toolbar` container
+   in EditorToolbar.css for this mount. */
+.unified-toolbar-editor .editor-toolbar-wrapper {
+  container-type: normal;
+}
+
+.unified-toolbar-editor .editor-toolbar {
+  border-bottom: none;
+}
+
+.unified-toolbar-canvas {
+  flex-shrink: 0;
+  display: flex;
+  align-items: stretch;
+  border-left: 1px solid var(--wb-6);
+}
+
+/* ── Main panels container ──────────────────────── */
+.app-container {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+}
+
+.editor-panel {
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  overflow: hidden;
+  min-width: 20%;
+  max-width: 80%;
+}
+
+/* Toggle button for the file explorer sidebar */
+.explorer-toggle-btn {
+  width: 36px;
+  flex-shrink: 0;
+  background: var(--wb-3);
+  border: none;
+  border-right: 1px solid var(--wb-6);
+  border-bottom: 1px solid var(--wb-6);
+  color: var(--wb-9);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 0.1s,
+    color 0.1s;
+}
+
+.explorer-toggle-btn:hover {
+  background: var(--wb-4);
+  color: var(--wb-12);
+}
+
+/* Resize handle for the file explorer sidebar */
+.explorer-resize-handle {
+  width: 4px;
+  flex-shrink: 0;
+  cursor: col-resize;
+  background: var(--wb-3);
+  transition: all 0.15s ease;
+  position: relative;
+  z-index: 5;
+}
+
+.explorer-resize-handle:hover,
+.explorer-resize-handle:active {
+  background: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+}
+
+.editor-wrapper {
+  flex: 1;
+  overflow: hidden;
+}
+
+.simulator-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 20%;
+}
+
+/* ── Resize handle ──────────────────────────────── */
+.resize-handle {
+  width: 6px;
+  flex-shrink: 0;
+  background: #08080b;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  position: relative;
+  z-index: 10;
+}
+
+.resize-handle:hover,
+.resize-handle:active {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.resize-handle-grip {
+  width: 2px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  transition: all 0.15s ease;
+}
+
+.resize-handle:hover .resize-handle-grip,
+.resize-handle:active .resize-handle-grip {
+  background: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
+}
+
+/* ── Responsive ─────────────────────────────────── */
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+
+  .editor-panel,
+  .simulator-panel {
+    width: 100% !important;
+    min-width: unset;
+    max-width: unset;
+    flex: 1;
+  }
+
+  .resize-handle {
+    display: none;
+  }
+}
+
+/* ── Mobile tab bar ──────────────────────────────── */
+.mobile-tab-bar {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-tab-bar {
+    display: flex;
+    flex-shrink: 0;
+    height: 44px;
+    background: var(--wb-2);
+    border-bottom: 2px solid var(--color-action-primary);
+    z-index: 50;
+    /* Sits between header and panels */
+  }
+
+  .mobile-tab-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--wb-9);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      color 0.15s,
+      background 0.15s,
+      border-color 0.15s;
+    padding: 8px 0;
+    margin-bottom: -2px;
+  }
+
+  .mobile-tab-btn--active {
+    color: var(--color-action-primary);
+    border-bottom-color: var(--color-action-primary);
+    background: var(--color-accent-soft);
+  }
+
+  .mobile-tab-btn:active {
+    background: var(--color-wash-hover);
+  }
+}
+
+/* ── View-mode toggle: desktop only (mobile uses bottom-nav) ─────── */
+@media (max-width: 768px) {
+  .view-mode-toggle {
+    display: none !important;
+  }
+}
+
+/* ── Header responsive ───────────────────────────── */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0 10px;
+    height: 44px;
+  }
+
+  .examples-link span,
+  .header-github-text,
+  .header-username-text {
+    display: none;
+  }
+
+  .examples-link {
+    padding: 6px 8px;
+  }
+
+  /* Mobile nav: hide links, show hamburger, dropdown on open */
+  .header-nav-links {
+    display: none;
+    position: absolute;
+    top: 44px;
+    left: 0;
+    right: 0;
+    background: var(--color-bg-header);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--color-border-default);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 6px 0;
+    z-index: 200;
+  }
+
+  .header-nav-links.header-nav-open {
+    display: flex;
+  }
+
+  .header-nav-link {
+    padding: 10px 16px;
+    border-radius: 0;
+    font-size: 14px;
+  }
+
+  .header-hamburger {
+    display: flex;
+  }
+}
+
+@keyframes velxio-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  50%      { opacity: 1.0; transform: scale(1.0); }
+}
+
+/* Marching-ants attention border (CameraToggle while it wants a click):
+   four thin repeating-gradient strips, one per edge, sliding one dash
+   period per cycle. Drawn as backgrounds rather than a border because a
+   CSS border cannot animate its dash offset. Uses currentColor so the
+   ants inherit the button's state colour (grey idle, red on error).
+   NOT named .velxio-ants: that class is the canvas selection outline
+   (SimulatorCanvas.css) whose ::after is position:absolute — on a
+   non-positioned button it anchored to the toolbar and drew a
+   toolbar-wide ant line. */
+@keyframes velxio-marching-ants {
+  to { background-position: 12px 0, -12px 100%, 0 -12px, 100% 12px; }
+}
+.velxio-btn-ants {
+  background-image:
+    repeating-linear-gradient(90deg, currentColor 0 6px, transparent 6px 12px),
+    repeating-linear-gradient(90deg, currentColor 0 6px, transparent 6px 12px),
+    repeating-linear-gradient(0deg, currentColor 0 6px, transparent 6px 12px),
+    repeating-linear-gradient(0deg, currentColor 0 6px, transparent 6px 12px);
+  background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+  background-size: 12px 1px, 12px 1px, 1px 12px, 1px 12px;
+  background-position: 0 0, 0 100%, 0 0, 100% 0;
+  animation: velxio-marching-ants 0.7s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .velxio-btn-ants { animation: none; }
+}
+
+/* ── Editor: toolbar riding inside the header ─────────────────────────────
+   With the marketing nav gone from the editor header, its middle was dead
+   space while the toolbar occupied a whole second bar. The strip now fills
+   that middle: one 44px row instead of 44+38 — a full row returned to the
+   code/canvas. The strip keeps its own class names (container queries, the
+   docked-chat padding-right) and wraps internally when it truly cannot
+   fit; the header then grows instead of clipping or overlapping. */
+/* ── Editor: two-tier header layout (Row 1: Brand & Menubar, Row 2: Unified Toolbar) ──
+   The brand and menubar (File, Edit, View, Account, Help) always stay on the top row.
+   The unified toolbar (view mode toggle, editor actions, canvas controls) always stays
+   on its own dedicated row below it. Fully responsive across desktop viewports. */
+.app-header--with-toolbar {
+  height: auto !important;
+  min-height: unset !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  border-bottom: 1px solid var(--color-border-default);
+  background-color: var(--color-bg-header);
+  overflow: visible !important;
+  position: relative !important;
+  z-index: 500 !important;
+}
+
+.app-header--with-toolbar .header-content {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  align-items: stretch !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+  position: relative !important;
+  z-index: 500 !important;
+}
+
+/* Row 1: Brand (Logo + Logicraft Studios + STUDIO badge) + Menubar (File, Edit, View, Account, Help) */
+.app-header--with-toolbar .header-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 14px;
+  background: var(--wb-2);
+  border-bottom: 1px solid var(--color-border-subtle);
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 0 0 36px !important;
+  white-space: nowrap;
+  position: relative !important;
+  z-index: 1000 !important;
+  overflow: visible !important;
+}
+
+/* Row 2: Unified Toolbar (Explorer toggle, Code/Both/Circuit, Compile, Run, Stop, Reset, Libraries, Output, Theme, Canvas controls) */
+.app-header--with-toolbar .header-editor-toolbar {
+  display: flex !important;
+  align-items: center !important;
+  height: 38px;
+  min-height: 38px;
+  max-height: 38px;
+  padding: 0 8px;
+  margin: 0 !important;
+  background: var(--wb-3);
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 0 0 38px !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  position: relative;
+  z-index: 10;
+}
+.app-header--with-toolbar .header-editor-toolbar::-webkit-scrollbar {
+  display: none;
+}
+
+.app-header--with-toolbar .header-editor-toolbar .unified-toolbar {
+  display: flex !important;
+  flex: 1 1 auto;
+  width: 100% !important;
+  min-width: max-content;
+  background: transparent !important;
+  border: none !important;
+  min-height: 38px;
+  height: 38px;
+  align-items: center !important;
+  white-space: nowrap;
+  padding-right: 6px !important;
+}
+
+.app-header--with-toolbar .header-editor-toolbar .editor-toolbar,
+.app-header--with-toolbar .header-editor-toolbar .unified-toolbar-editor .editor-toolbar {
+  background: transparent !important;
+  border-bottom: none !important;
+  height: 38px;
+}
+
+.app-header--with-toolbar.app-header--strip-below .header-content {
+  flex-direction: column !important;
+}
+.app-header--with-toolbar.app-header--strip-below .header-editor-toolbar {
+  margin: 0 !important;
+}
+.app-header--with-toolbar.app-header--strip-below .header-editor-toolbar .unified-toolbar {
+  border-top: none !important;
+  background: transparent !important;
+}
+
+/* Tauri desktop build: hide brand row since native window frame has title and menus */
+.app-header--desktop .header-left {
+  display: none !important;
+}
+.app-header--desktop .header-editor-toolbar {
+  margin-left: 0;
+}
+
+/* ── Editor corner box (bottom-left) ─────────────────────────────────────
+   Language switcher + account button, IDE style. Moving them out of the
+   header is what buys the toolbar the last ~150px it needed to keep the
+   single-row layout on 1440px screens with the chat docked. */
+.editor-corner-box {
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+  z-index: 7000; /* above the canvas, below the chat (8000) and modals */
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background: rgba(12, 12, 16, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+}
+
+/* With the chat rising to the very top (agent CSS sets the header's
+   padding-right), the strip must NOT also pad itself — that would double
+   the reservation and squeeze the toolbar by another panel-width. */
+.app-header--with-toolbar .header-editor-toolbar .unified-toolbar {
+  padding-right: 6px !important;
+}
+
+/* ── Explorer account footer ─────────────────────────────────────────────
+   The account + language block fused to the bottom of the file explorer */
+.explorer-account-footer {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: #09090d;
+}
+
+.explorer-account-footer {
+  container-type: inline-size;
+}
+
+/* Tight footer (narrow explorer): the avatar alone identifies the account;
+   the name is a luxury that costs exactly the width we do not have. The
+   threshold sits under the explorer's 150px default so the first name shows
+   out of the box and only goes when the user drags the pane narrower. */
+@container (max-width: 135px) {
+  .explorer-account-footer .header-username-text {
+    display: none;
+  }
+}
+
+/* Collapsed explorer: the floating fallback box shows the circle only. */
+.editor-corner-box .header-username-text {
+  display: none;
+}
+
+/* Flash dialog: indeterminate bar while the sketch compiles before a flash. */
+@keyframes flash-indeterminate {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+.flash-indeterminate {
+  animation: flash-indeterminate 1.4s ease-in-out infinite;
+}
+
+/* ── Pinned-dark subtrees (pro DarkSurface) ──────────────
+   The marketing pages render inside a [data-theme=dark] island, so the
+   appearance switch in the header would set a preference the reader cannot
+   see take effect until they navigate away. Hide it there; the editor's own
+   toolbar and the View menu remain the way in. */
+.velxio-dark-surface .header-theme-toggle {
+  display: none;
+}
+
+.header-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-fg-muted);
+  cursor: pointer;
+  transition:
+    background var(--duration-base) var(--ease-out),
+    color var(--duration-base) var(--ease-out);
+}
+
+.header-theme-toggle:hover {
+  background: var(--color-wash-hover);
+  color: var(--color-fg-default);
+}

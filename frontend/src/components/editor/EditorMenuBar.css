@@ -1,0 +1,214 @@
+/* EditorMenuBar — File / Edit dropdowns in the editor header.
+   Visual language borrowed from the toolbar's overflow menu
+   (tb-overflow-menu) so the two read as one system. */
+
+.editor-menubar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 2px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.emb-root {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.emb-trigger {
+  background: transparent;
+  border: none;
+  color: var(--wb-12);
+  font: 500 13px system-ui, sans-serif;
+  padding: 4px 7px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.15s ease-out;
+}
+
+.emb-trigger:hover,
+.emb-trigger-open {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.emb-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 230px;
+  background: #181822;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  padding: 5px;
+  z-index: 99999 !important; /* above the toolbar and the canvas */
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.emb-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: #f4f4f5;
+  font: 400 13px system-ui, sans-serif;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition: all 0.12s ease-out;
+}
+
+.emb-item:hover:not(:disabled) {
+  background: rgba(0, 113, 227, 0.25);
+  color: #ffffff;
+}
+
+.emb-item:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.emb-shortcut {
+  color: #71717a;
+  font-size: 11px;
+}
+
+.emb-item:hover:not(:disabled) .emb-shortcut {
+  color: #93c5fd;
+}
+
+.emb-separator {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 4px 6px;
+}
+
+/* Small uppercase section header inside a menu (the Account menu groups
+   the pro items and the Language list under one trigger). */
+.emb-section-label {
+  padding: 6px 12px 2px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--wb-10);
+  user-select: none;
+}
+
+/* Same PRO pill the old toolbar overflow used (tb-overflow-pro) — users
+   should know an item is premium BEFORE clicking, not via a surprise
+   upgrade prompt. */
+.emb-pro {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: linear-gradient(135deg, #ffd54f 0%, #ffb300 100%);
+  color: var(--wb-1);
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+/* Account dropdown content */
+.emb-account-menu-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.emb-account-profile-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 6px;
+}
+
+.emb-account-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 13px;
+  color: #fff;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.emb-account-details {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.emb-account-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #f8fafc;
+  line-height: 1.2;
+}
+
+.emb-account-sub {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.3;
+}
+
+.emb-account-roll {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  color: #38bdf8;
+  margin-top: 1px;
+}
+
+.emb-account-github-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  background: linear-gradient(135deg, #24292f 0%, #1f2428 100%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  font: 600 12.5px system-ui, sans-serif;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  margin: 4px 0 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.15s ease;
+}
+
+.emb-account-github-btn:hover {
+  background: #2ea043;
+  border-color: #2ea043;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(46, 160, 67, 0.35);
+}
+
+.emb-trigger-about {
+  color: #93c5fd;
+  font-weight: 600;
+}
+
+.emb-trigger-about:hover,
+.emb-trigger-about.emb-trigger-open {
+  background: rgba(59, 130, 246, 0.18);
+  color: #ffffff;
+}
+

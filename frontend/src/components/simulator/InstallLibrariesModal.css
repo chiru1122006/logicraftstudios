@@ -1,0 +1,286 @@
+.ilib-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-bg-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Above the agent side panel (z 8000): a modal is always the top task. */
+  z-index: 9000;
+  backdrop-filter: blur(4px);
+  animation: ilib-fadeIn 0.15s ease;
+}
+
+@keyframes ilib-fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ilib-modal {
+  background: #0c0c11;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  width: 480px;
+  max-width: 95vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.9);
+  animation: ilib-slideIn 0.2s ease;
+  overflow: hidden;
+}
+
+@keyframes ilib-slideIn {
+  from {
+    transform: translateY(-16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Header */
+.ilib-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: #09090d;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ilib-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--wb-12);
+  text-transform: uppercase;
+}
+
+.ilib-close-btn {
+  background: none;
+  border: none;
+  color: var(--wb-10);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.15s;
+  line-height: 1;
+}
+
+.ilib-close-btn:hover:not(:disabled) {
+  background: var(--wb-4);
+  color: var(--wb-13);
+}
+
+.ilib-close-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Subtitle */
+.ilib-subtitle {
+  padding: 10px 18px;
+  font-size: 13px;
+  color: var(--wb-10);
+  border-bottom: 1px solid var(--wb-3);
+  background: var(--wb-1);
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+}
+
+.ilib-subtitle-installing {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-action-primary);
+  font-weight: 500;
+}
+
+.ilib-subtitle-done {
+  color: var(--color-feedback-success);
+  font-weight: 500;
+}
+
+/* Library list */
+.ilib-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 0;
+}
+
+.ilib-list::-webkit-scrollbar {
+  width: 6px;
+}
+.ilib-list::-webkit-scrollbar-track {
+  background: var(--wb-0);
+}
+.ilib-list::-webkit-scrollbar-thumb {
+  background: var(--wb-6);
+  border-radius: 3px;
+}
+
+.ilib-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--wb-2);
+  gap: 12px;
+  transition: background 0.1s;
+}
+
+.ilib-item:hover {
+  background: var(--wb-2);
+}
+
+.ilib-item-name {
+  font-size: 13px;
+  color: var(--wb-13);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ilib-item--done .ilib-item-name {
+  color: var(--wb-10);
+}
+.ilib-item--error .ilib-item-name {
+  color: var(--wb-10);
+}
+
+.ilib-item-status {
+  flex-shrink: 0;
+}
+
+/* Status badges */
+.ilib-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.ilib-badge--pending {
+  color: var(--wb-9);
+  background: var(--wb-1);
+  border: 1px solid var(--wb-6);
+}
+
+.ilib-badge--installing {
+  color: var(--color-action-primary);
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-accent-border);
+}
+
+.ilib-badge--done {
+  color: var(--color-feedback-success);
+  background: var(--color-feedback-success-soft);
+  border: 1px solid var(--color-feedback-success-border);
+}
+
+.ilib-badge--error {
+  color: var(--color-feedback-error);
+  background: var(--color-feedback-error-soft);
+  border: 1px solid var(--color-feedback-error-border);
+  cursor: help;
+}
+
+.ilib-badge--wokwi {
+  color: var(--color-accent-fg);
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-accent-border);
+  margin-left: 6px;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: default;
+}
+
+/* Spinner */
+.ilib-spinner {
+  flex-shrink: 0;
+  animation: ilib-spin 0.8s linear infinite;
+}
+
+@keyframes ilib-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Footer */
+.ilib-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  background: #09090d;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ilib-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.ilib-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.ilib-btn--primary {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(14, 165, 233, 0.35);
+}
+
+.ilib-btn--primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.5);
+  transform: translateY(-1px);
+}
+
+.ilib-btn--ghost {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--wb-11);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ilib-btn--ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}

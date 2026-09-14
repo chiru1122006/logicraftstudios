@@ -1,0 +1,331 @@
+/* ── Oscilloscope panel ─────────────────────────────────────────────────── */
+
+.osc-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--wb-2);
+  border-top: 1px solid var(--wb-6);
+  font-family: 'Consolas', 'Menlo', monospace;
+  font-size: 12px;
+  color: var(--wb-12);
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.osc-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: var(--wb-3);
+  border-bottom: 1px solid var(--wb-6);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  min-height: 32px;
+}
+
+.osc-title {
+  color: var(--wb-12);
+  font-weight: 600;
+  font-size: 12px;
+  white-space: nowrap;
+  margin-right: 4px;
+}
+
+.osc-btn {
+  background: transparent;
+  border: 1px solid var(--wb-8);
+  color: var(--wb-12);
+  padding: 2px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+  white-space: nowrap;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.osc-btn:hover {
+  border-color: var(--color-action-primary);
+  color: var(--wb-13);
+}
+
+.osc-btn-active {
+  background: var(--color-accent-soft);
+  border-color: var(--color-action-primary);
+  color: var(--color-action-primary);
+}
+
+.osc-btn-danger {
+  border-color: var(--color-feedback-error-border);
+  color: var(--color-feedback-error);
+}
+
+.osc-btn-danger:hover {
+  background: var(--color-feedback-error-soft);
+  border-color: var(--color-feedback-error);
+}
+
+.osc-label {
+  color: var(--wb-10);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.osc-select {
+  background: var(--wb-2);
+  border: 1px solid var(--wb-7);
+  color: var(--wb-12);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 11px;
+  outline: none;
+  cursor: pointer;
+}
+
+.osc-select:focus {
+  border-color: var(--color-action-primary);
+}
+
+/* ── Channel picker dropdown ── */
+.osc-picker-wrap {
+  position: relative;
+}
+
+.osc-picker-dropdown {
+  /* position/left/bottom/z-index set via inline style (portal) */
+  background: var(--wb-3);
+  border: 1px solid var(--wb-8);
+  border-radius: 4px;
+  padding: 4px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3px;
+  min-width: 200px;
+  box-shadow: 0 -4px 20px var(--color-canvas-shadow);
+}
+
+/* Multi-board picker layout */
+.osc-picker-multiboard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  min-width: 260px;
+  max-height: 320px;
+  overflow: hidden;
+}
+
+.osc-picker-board-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--wb-6);
+  padding-bottom: 6px;
+}
+
+.osc-picker-board-tab {
+  background: var(--wb-5);
+  border: 1px solid var(--wb-7);
+  color: var(--wb-10);
+  padding: 2px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+  font-family: inherit;
+  transition:
+    background 0.1s,
+    color 0.1s;
+}
+
+.osc-picker-board-tab:hover {
+  background: var(--wb-6);
+  color: var(--wb-12);
+}
+
+.osc-picker-board-tab.active {
+  background: var(--color-accent-soft);
+  border-color: var(--color-action-primary);
+  color: var(--color-action-primary);
+}
+
+.osc-picker-board-label {
+  font-size: 10px;
+  color: var(--wb-9);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.osc-picker-pins {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.osc-pin-btn {
+  background: var(--wb-5);
+  border: 1px solid var(--wb-7);
+  color: var(--wb-12);
+  padding: 3px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+  text-align: center;
+  transition:
+    background 0.1s,
+    border-color 0.1s;
+}
+
+.osc-pin-btn:hover {
+  background: var(--color-accent-soft);
+  border-color: var(--color-action-primary);
+  color: var(--wb-13);
+}
+
+.osc-pin-btn-active {
+  background: var(--color-feedback-success-soft);
+  border-color: var(--color-feedback-success-border);
+  color: var(--color-feedback-success);
+  cursor: default;
+}
+
+/* ── Waveform area ── */
+.osc-waveforms {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--wb-0);
+}
+
+.osc-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--wb-8);
+  font-size: 12px;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.osc-channel-row {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--wb-1);
+  height: 60px;
+}
+
+.osc-channel-label {
+  width: 72px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px;
+  background: var(--wb-1);
+  border-right: 1px solid var(--wb-3);
+  gap: 2px;
+}
+
+.osc-channel-board {
+  font-size: 9px;
+  color: var(--wb-9);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.osc-channel-name {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.osc-channel-remove {
+  background: transparent;
+  border: none;
+  color: var(--wb-8);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+  transition: color 0.1s;
+}
+
+.osc-channel-remove:hover {
+  color: var(--color-feedback-error);
+}
+
+.osc-channel-canvas-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.osc-channel-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Time ruler ── */
+.osc-ruler {
+  height: 20px;
+  flex-shrink: 0;
+  background: var(--wb-1);
+  border-top: 1px solid var(--wb-3);
+  position: relative;
+}
+
+.osc-ruler-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Trigger status badge ───────────────────────────────────────────────── */
+.osc-trigger-status {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid currentColor;
+}
+
+.osc-trigger-status-idle {
+  color: var(--wb-9);
+}
+
+.osc-trigger-status-armed {
+  color: var(--color-feedback-warning);
+  background: var(--color-feedback-warning-soft);
+  animation: osc-pulse-armed 1.5s ease-in-out infinite;
+}
+
+.osc-trigger-status-triggered {
+  color: var(--color-feedback-success);
+  background: var(--color-feedback-success-soft);
+}
+
+.osc-trigger-status-captured {
+  color: var(--color-feedback-warning);
+  background: var(--color-feedback-warning-soft);
+  border-color: var(--color-feedback-warning);
+}
+
+@keyframes osc-pulse-armed {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}

@@ -1,0 +1,98 @@
+.component-palette {
+  background-color: var(--wb-5);
+  border-right: 1px solid var(--wb-7);
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  height: 100%;
+}
+
+.palette-header {
+  padding: 15px;
+  border-bottom: 1px solid var(--wb-7);
+}
+
+.palette-header h3 {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  color: var(--wb-13);
+}
+
+.palette-hint {
+  font-size: 12px;
+  color: var(--wb-10);
+}
+
+.palette-items {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.palette-item {
+  background-color: var(--wb-7);
+  padding: 12px;
+  border-radius: 6px;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+
+.palette-item:hover {
+  background-color: var(--wb-8);
+  border-color: var(--color-action-primary);
+}
+
+.palette-item:active {
+  cursor: grabbing;
+  transform: scale(0.95);
+}
+
+.palette-icon {
+  font-size: 24px;
+  width: 30px;
+  text-align: center;
+}
+
+.palette-label {
+  font-size: 14px;
+  color: var(--wb-13);
+  font-weight: 500;
+}
+
+.palette-help {
+  padding: 15px;
+  border-top: 1px solid var(--wb-7);
+  background-color: var(--wb-3);
+}
+
+.palette-help p {
+  margin: 5px 0;
+  font-size: 11px;
+  color: var(--wb-10);
+  line-height: 1.4;
+}
+
+/* Scrollbar styling */
+.palette-items::-webkit-scrollbar {
+  width: 6px;
+}
+
+.palette-items::-webkit-scrollbar-track {
+  background: var(--wb-5);
+}
+
+.palette-items::-webkit-scrollbar-thumb {
+  background: var(--wb-8);
+  border-radius: 3px;
+}
+
+.palette-items::-webkit-scrollbar-thumb:hover {
+  background: var(--wb-9);
+}
