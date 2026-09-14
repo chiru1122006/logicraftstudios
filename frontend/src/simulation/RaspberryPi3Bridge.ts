@@ -28,7 +28,7 @@
  */
 
 import { getTabSessionId } from './Esp32Bridge';
-import { getSimWebSocketUrl } from '../lib/apiBase';
+import { getSimWebSocketUrl, fetchSimulationWsBase } from '../lib/apiBase';
 
 export class RaspberryPi3Bridge {
   readonly boardId: string;
@@ -106,102 +106,124 @@ export class RaspberryPi3Bridge {
     // after a run silently did nothing — no boot, and the toolbar still
     // showing Stop. Drop it and open a fresh one.
     this.socket = null;
+    this._aborted = false;
 
-    const clientId = `${this.boardId}--${getTabSessionId()}`;
-    const wsUrl = getSimWebSocketUrl(clientId);
+    const doConnect = () => {
+      if (this._aborted || this.socket) return;
+      const clientId = `${this.boardId}--${getTabSessionId()}`;
+      const wsUrl = getSimWebSocketUrl(clientId);
 
-    const socket = new WebSocket(wsUrl);
-    this.socket = socket;
+      const socket = new WebSocket(wsUrl);
+      this.socket = socket;
 
-    socket.onopen = () => {
-      this._connected = true;
-      this.onConnected?.();
-      // Tell the backend which Pi family member to boot.
-      this._send({
-        type: 'start_pi',
-        data: { board: this.boardKind, ...this.startPayload },
-      });
-      if (this.quietBootDefault) {
-        this._quiet = true;
-        const label = this.quietBootLabel || this.boardKind;
-        this._emitLocal(`[Velxio] Booting ${label} (Linux guest)`);
-        this._quietTimer = setInterval(() => this._emitLocal('.', false), 4000);
-      }
-    };
-
-    socket.onmessage = (event: MessageEvent) => {
-      let msg: { type: string; data: Record<string, unknown> };
-      try {
-        msg = JSON.parse(event.data as string);
-      } catch {
-        return;
-      }
-
-      switch (msg.type) {
-        case 'serial_output': {
-          const text = (msg.data.data as string) ?? '';
-          // quietBoot: keep observing (boot marker + prompt waiters drive
-          // guestSetup and the upload) but withhold the branded chatter.
-          if (!this._quiet && this.onSerialData) {
-            for (const ch of text) this.onSerialData(ch);
+      socket.onopen = () => {
+        if (this._aborted) {
+          try {
+            socket.close();
+          } catch {
+            // ignore
           }
-          this._observeSerial(text);
-          break;
+          return;
         }
-        case 'gpio_change': {
-          const pin = msg.data.pin as number;
-          const state = (msg.data.state as number) === 1;
-          this.onPinChange?.(pin, state);
-          break;
+        this._connected = true;
+        this.onConnected?.();
+        // Tell the backend which Pi family member to boot.
+        this._send({
+          type: 'start_pi',
+          data: { board: this.boardKind, ...this.startPayload },
+        });
+        if (this.quietBootDefault) {
+          this._quiet = true;
+          const label = this.quietBootLabel || this.boardKind;
+          this._emitLocal(`[Velxio] Booting ${label} (Linux guest)`);
+          this._quietTimer = setInterval(() => this._emitLocal('.', false), 4000);
         }
-        case 'system':
-          this.onSystemEvent?.(msg.data.event as string, msg.data);
-          break;
-        case 'display':
-          this.onDisplay?.((msg.data.data as string) ?? '');
-          break;
-        case 'uart_tx': {
-          const b64 = (msg.data.data as string) ?? '';
-          if (b64) {
-            try {
-              this.onUartTx?.(
-                new TextDecoder().decode(
-                  Uint8Array.from(atob(b64), (ch) => ch.charCodeAt(0)),
-                ),
-              );
-            } catch {
-              /* malformed payload — never kill the session over it */
+      };
+
+      socket.onmessage = (event: MessageEvent) => {
+        let msg: { type: string; data: Record<string, unknown> };
+        try {
+          msg = JSON.parse(event.data as string);
+        } catch {
+          return;
+        }
+
+        switch (msg.type) {
+          case 'serial_output': {
+            const text = (msg.data.data as string) ?? '';
+            // quietBoot: keep observing (boot marker + prompt waiters drive
+            // guestSetup and the upload) but withhold the branded chatter.
+            if (!this._quiet && this.onSerialData) {
+              for (const ch of text) this.onSerialData(ch);
             }
+            this._observeSerial(text);
+            break;
           }
-          break;
+          case 'gpio_change': {
+            const pin = msg.data.pin as number;
+            const state = (msg.data.state as number) === 1;
+            this.onPinChange?.(pin, state);
+            break;
+          }
+          case 'system':
+            this.onSystemEvent?.(msg.data.event as string, msg.data);
+            break;
+          case 'display':
+            this.onDisplay?.((msg.data.data as string) ?? '');
+            break;
+          case 'uart_tx': {
+            const b64 = (msg.data.data as string) ?? '';
+            if (b64) {
+              try {
+                this.onUartTx?.(
+                  new TextDecoder().decode(
+                    Uint8Array.from(atob(b64), (ch) => ch.charCodeAt(0)),
+                  ),
+                );
+              } catch {
+                // malformed payload
+              }
+            }
+            break;
+          }
+          case 'gpio_pwm': {
+            const pin = msg.data.pin as number;
+            const freq = (msg.data.frequency as number) ?? 0;
+            const duty = (msg.data.duty_cycle as number) ?? 0;
+            const eventKind = (msg.data.event as string) ?? '';
+            this.onGpioPwm?.(pin, freq, duty, eventKind);
+            break;
+          }
+          case 'error': {
+            const message = (msg.data.message as string) ?? 'Simulation error';
+            const code = (msg.data.code as string) ?? undefined;
+            this.onError?.(message, code);
+            break;
+          }
         }
-        case 'gpio_pwm':
-          this.onGpioPwm?.(
-            (msg.data.pin as number) ?? 0,
-            (msg.data.frequency as number) ?? 0,
-            (msg.data.duty_cycle as number) ?? 0,
-            (msg.data.event as string) ?? 'change',
-          );
-          break;
-        case 'error':
-          this.onError?.(msg.data.message as string, msg.data.code as string | undefined);
-          break;
-      }
+      };
+
+      socket.onclose = () => {
+        this._connected = false;
+        this.socket = null;
+        this._resetBootState();
+        this.onDisconnected?.();
+      };
+
+      socket.onerror = () => {
+        this.onError?.('WebSocket error');
+      };
     };
 
-    socket.onclose = () => {
-      this._connected = false;
-      this.socket = null;
-      this._resetBootState();
-      this.onDisconnected?.();
-    };
-
-    socket.onerror = () => {
-      this.onError?.('WebSocket error');
-    };
+    if (typeof window !== 'undefined' && window.location.protocol === 'https:' && !localStorage.getItem('LOGICRAFT_WS_BASE')) {
+      fetchSimulationWsBase().finally(doConnect);
+    } else {
+      doConnect();
+    }
   }
 
   disconnect(): void {
+    this._aborted = true;
     if (this.socket) {
       // Tell backend to stop Pi before closing
       this._send({ type: 'stop_pi' });

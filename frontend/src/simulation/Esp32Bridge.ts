@@ -102,7 +102,7 @@ export {
   isSingleWireSensorRecord,
   sensorRecordOwnsPin,
 } from './sensorModels';
-import { getSimWebSocketUrl } from '../lib/apiBase';
+import { getSimWebSocketUrl, fetchSimulationWsBase } from '../lib/apiBase';
 
 /** Returns a stable UUID for this browser tab (persists across reloads, resets on new tab). */
 export function getTabSessionId(): string {
@@ -265,6 +265,7 @@ export class Esp32Bridge {
 
   private socket: WebSocket | null = null;
   private _connected = false;
+  private _aborted = false;
   private _pendingFirmware: string | null = null;
   private _pendingSensors: Array<Record<string, unknown>> = [];
 
@@ -382,15 +383,26 @@ export class Esp32Bridge {
       this.socket = null;
       this._connected = false;
     }
+    this._aborted = false;
 
-    const sessionId = getTabSessionId();
-    const wsUrl = getSimWebSocketUrl(sessionId + '::' + this.boardId);
+    const doConnect = () => {
+      if (this._aborted || this.socket) return;
+      const sessionId = getTabSessionId();
+      const wsUrl = getSimWebSocketUrl(sessionId + '::' + this.boardId);
 
-    const socket = new WebSocket(wsUrl);
-    this.socket = socket;
+      const socket = new WebSocket(wsUrl);
+      this.socket = socket;
 
-    socket.onopen = () => {
-      this._connected = true;
+      socket.onopen = () => {
+        if (this._aborted) {
+          try {
+            socket.close();
+          } catch {
+            // ignore
+          }
+          return;
+        }
+        this._connected = true;
       console.log(
         `[Esp32Bridge:${this.boardId}] WebSocket connected → sending start_esp32 (firmware: ${this._pendingFirmware ? `${Math.round((this._pendingFirmware.length * 0.75) / 1024)}KB` : 'none'})`,
       );
@@ -626,13 +638,21 @@ export class Esp32Bridge {
       this.onDisconnected?.();
     };
 
-    socket.onerror = (ev) => {
-      console.error(`[Esp32Bridge:${this.boardId}] WebSocket error`, ev);
-      this.onError?.('WebSocket error');
+      socket.onerror = (ev) => {
+        console.error(`[Esp32Bridge:${this.boardId}] WebSocket error`, ev);
+        this.onError?.('WebSocket error');
+      };
     };
+
+    if (typeof window !== 'undefined' && window.location.protocol === 'https:' && !localStorage.getItem('LOGICRAFT_WS_BASE')) {
+      fetchSimulationWsBase().finally(doConnect);
+    } else {
+      doConnect();
+    }
   }
 
   disconnect(): void {
+    this._aborted = true;
     if (this.socket) {
       this._send({ type: 'stop_esp32' });
       this.socket.close();

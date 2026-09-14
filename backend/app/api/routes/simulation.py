@@ -30,6 +30,35 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
+@router.get('/config')
+def get_simulation_config():
+    """Return the active simulation WebSocket endpoint URL for clients."""
+    import os
+    ws_url = os.environ.get('LOGICRAFT_WS_URL') or os.environ.get('VELXIO_WS_URL')
+    if not ws_url:
+        for p in (
+            '/app/data/cloudflared_tunnel.url',
+            '/tmp/cloudflared_tunnel.url',
+            '/var/run/cloudflared_tunnel.url',
+            '/opt/velxio/data/cloudflared_tunnel.url',
+        ):
+            if os.path.isfile(p):
+                try:
+                    with open(p, 'r') as f:
+                        url = f.read().strip()
+                        if url:
+                            ws_url = url.replace('https://', 'wss://').replace('http://', 'ws://')
+                            if not ws_url.endswith('/api'):
+                                ws_url += '/api'
+                            break
+                except Exception:
+                    pass
+    return {
+        "ws_url": ws_url,
+        "default_ws_url": "wss://api.logicraftstudios.tech/api",
+    }
+
+
 class ConnectionManager:
     def __init__(self):
         self.active_connections: dict[str, WebSocket] = {}

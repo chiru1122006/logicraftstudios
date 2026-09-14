@@ -27,7 +27,7 @@
 
 import type { BoardKind } from '../types/board';
 import { generateUUID } from '../utils/uuid';
-import { getSimWebSocketUrl } from '../lib/apiBase';
+import { getSimWebSocketUrl, fetchSimulationWsBase } from '../lib/apiBase';
 
 export function getTabSessionId(): string {
   if (typeof sessionStorage === 'undefined') return generateUUID();
@@ -92,6 +92,7 @@ export class Stm32Bridge {
 
   private socket: WebSocket | null = null;
   private _connected = false;
+  private _aborted = false;
   private _pendingFirmware: string | null = null;
   private _pendingSensors: Array<Record<string, unknown>> = [];
 
@@ -110,15 +111,26 @@ export class Stm32Bridge {
 
   connect(): void {
     if (this.socket && this.socket.readyState !== WebSocket.CLOSED) return;
+    this._aborted = false;
 
-    const sessionId = getTabSessionId();
-    const wsUrl = getSimWebSocketUrl(sessionId + '::' + this.boardId);
+    const doConnect = () => {
+      if (this._aborted || this.socket) return;
+      const sessionId = getTabSessionId();
+      const wsUrl = getSimWebSocketUrl(sessionId + '::' + this.boardId);
 
-    const socket = new WebSocket(wsUrl);
-    this.socket = socket;
+      const socket = new WebSocket(wsUrl);
+      this.socket = socket;
 
-    socket.onopen = () => {
-      this._connected = true;
+      socket.onopen = () => {
+        if (this._aborted) {
+          try {
+            socket.close();
+          } catch {
+            // ignore
+          }
+          return;
+        }
+        this._connected = true;
       this.onConnected?.();
       this._send({
         type: 'start_stm32',
@@ -215,15 +227,23 @@ export class Stm32Bridge {
       }
     };
 
-    socket.onclose = () => {
-      this._connected = false;
-      this.socket = null;
-      this.onDisconnected?.();
+      socket.onclose = () => {
+        this._connected = false;
+        this.socket = null;
+        this.onDisconnected?.();
+      };
+      socket.onerror = () => this.onError?.('WebSocket error');
     };
-    socket.onerror = () => this.onError?.('WebSocket error');
+
+    if (typeof window !== 'undefined' && window.location.protocol === 'https:' && !localStorage.getItem('LOGICRAFT_WS_BASE')) {
+      fetchSimulationWsBase().finally(doConnect);
+    } else {
+      doConnect();
+    }
   }
 
   disconnect(): void {
+    this._aborted = true;
     if (this.socket) {
       this._send({ type: 'stop_stm32' });
       this.socket.close();
