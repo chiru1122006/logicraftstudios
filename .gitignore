@@ -84,6 +84,8 @@ arduino_projects.db
 # Temporary files
 *.tmp
 *.temp
+*.pem
+*.key
 .cache/
 
 # Coverage

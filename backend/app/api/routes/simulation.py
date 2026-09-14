@@ -7,6 +7,16 @@ from app.services.board_access import PRO_BOARD_MESSAGE
 from app.services.esp32_lib_manager import esp_lib_manager
 from app.core.hooks import dispatch_ws_sim_message, dispatch_ws_sim_disconnect
 
+try:
+    from app.services.qemu_manager import qemu_manager
+except ImportError:
+    qemu_manager = None
+
+try:
+    from app.services.stm32_lib_manager import stm32_lib_manager
+except ImportError:
+    stm32_lib_manager = None
+
 
 
 
@@ -83,23 +93,58 @@ async def simulation_websocket(websocket: WebSocket, client_id: str):
             # `serial_input`, `gpio_in` and `pin_change` read as generic but
             # have only ever driven the Linux guests; the ESP32 and Pico lanes
             # use their own prefixed message names.
-            if msg_type in (
-                'start_pi', 'stop_pi', 'serial_input', 'gpio_in', 'pin_change',
-                'pi_sensor_state', 'pi_uart_rx', 'pi_attach_slave', 'pi_detach_slave',
-                'start_stm32', 'stop_stm32', 'stm32_load_firmware', 'stm32_gpio_in',
-                'stm32_serial_input', 'stm32_sensor_attach', 'stm32_sensor_update',
-                'stm32_sensor_detach',
-            ):
-                handled = await dispatch_ws_sim_message(
-                    websocket, client_id, msg_type, msg_data, qemu_callback,
-                )
-                if not handled and msg_type in ('start_pi', 'start_stm32'):
-                    # No extension installed: say so instead of going quiet.
-                    # Silence here reads as a hung Run button — the user gets
-                    # no error, no serial output and no stop. Only the two
-                    # start messages answer; the rest of the lane's traffic
-                    # would just repeat the same line.
-                    await qemu_callback('error', {'message': PRO_BOARD_MESSAGE})
+            # ── Raspberry Pi (QEMU Linux) ────────────────────────────────
+            if msg_type == 'start_pi':
+                board = msg_data.get('board', 'raspberry-pi-3')
+                if qemu_manager is not None:
+                    qemu_manager.start_instance(client_id, board, qemu_callback)
+                else:
+                    await qemu_callback('error', {'message': 'Raspberry Pi QEMU service is not available.'})
+
+            elif msg_type == 'stop_pi':
+                if qemu_manager is not None:
+                    qemu_manager.stop_instance(client_id)
+
+            elif msg_type == 'serial_input':
+                raw_bytes = msg_data.get('bytes', [])
+                if raw_bytes and qemu_manager is not None:
+                    await qemu_manager.send_serial_bytes(client_id, bytes(raw_bytes))
+
+            elif msg_type in ('gpio_in', 'pin_change'):
+                pin = msg_data.get('pin', 0)
+                state = msg_data.get('state', 0)
+                if qemu_manager is not None:
+                    qemu_manager.set_pin_state(client_id, pin, state)
+
+            # ── STM32 lifecycle ──────────────────────────────────────────
+            elif msg_type == 'start_stm32':
+                board = msg_data.get('board', 'stm32-bluepill')
+                firmware_b64 = msg_data.get('firmware_b64')
+                sensors = msg_data.get('sensors', [])
+                if stm32_lib_manager is not None and stm32_lib_manager.is_available():
+                    await stm32_lib_manager.start_instance(client_id, board, qemu_callback, firmware_b64, sensors)
+                else:
+                    await qemu_callback('error', {'message': 'STM32 QEMU emulation library is not installed.'})
+
+            elif msg_type == 'stop_stm32':
+                if stm32_lib_manager is not None:
+                    await stm32_lib_manager.stop_instance(client_id)
+
+            elif msg_type == 'stm32_load_firmware':
+                firmware_b64 = msg_data.get('firmware_b64', '')
+                if firmware_b64 and stm32_lib_manager is not None:
+                    stm32_lib_manager.load_firmware(client_id, firmware_b64)
+
+            elif msg_type == 'stm32_serial_input':
+                raw_bytes = msg_data.get('bytes', [])
+                if raw_bytes and stm32_lib_manager is not None:
+                    await stm32_lib_manager.send_serial_bytes(client_id, bytes(raw_bytes))
+
+            elif msg_type == 'stm32_gpio_in':
+                pin = msg_data.get('pin', 0)
+                state = msg_data.get('state', 0)
+                if stm32_lib_manager is not None:
+                    stm32_lib_manager.set_pin_state(client_id, pin, state)
 
             # ── ESP32 lifecycle ──────────────────────────────────────────
             elif msg_type == 'start_esp32':
@@ -317,8 +362,10 @@ async def simulation_websocket(websocket: WebSocket, client_id: str):
         # A newer simulation_websocket may have already connected and replaced us.
         if manager.active_connections.get(client_id) is websocket:
             manager.disconnect(client_id)
-            # Tear down whatever an extension started for this client (a Pi
-            # guest is a real QEMU child holding 1-2 GB, so this must run).
+            if qemu_manager is not None:
+                qemu_manager.stop_instance(client_id)
+            if stm32_lib_manager is not None:
+                await stm32_lib_manager.stop_instance(client_id)
             await dispatch_ws_sim_disconnect(client_id)
             await esp_lib_manager.stop_instance(client_id)
             esp_qemu_manager.stop_instance(client_id)
@@ -328,8 +375,10 @@ async def simulation_websocket(websocket: WebSocket, client_id: str):
         logger.error('WebSocket error for %s: %s', client_id, exc)
         if manager.active_connections.get(client_id) is websocket:
             manager.disconnect(client_id)
-            # Tear down whatever an extension started for this client (a Pi
-            # guest is a real QEMU child holding 1-2 GB, so this must run).
+            if qemu_manager is not None:
+                qemu_manager.stop_instance(client_id)
+            if stm32_lib_manager is not None:
+                await stm32_lib_manager.stop_instance(client_id)
             await dispatch_ws_sim_disconnect(client_id)
             await esp_lib_manager.stop_instance(client_id)
             esp_qemu_manager.stop_instance(client_id)
