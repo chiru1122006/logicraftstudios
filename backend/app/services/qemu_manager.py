@@ -343,18 +343,7 @@ class QemuManager:
         # (data is silently dropped). Pipe chardev sidesteps that;
         # see project/pi-emulation/decisions.md D9.
         inst.serial_port = _find_free_port()
-        inst.gpio_port   = _find_free_port()  # kept for legacy log fields
-
-        # Make a fresh FIFO pair per session. QEMU's pipe chardev
-        # appends ".in" (host writes / guest reads) and ".out"
-        # (guest writes / host reads) to the path.
-        inst.proto_pipe_base = tempfile.mktemp(prefix="velxio-pi-proto-")
-        for suffix in (".in", ".out"):
-            path = inst.proto_pipe_base + suffix
-            try:
-                os.mkfifo(path, 0o600)
-            except FileExistsError:
-                pass
+        inst.gpio_port   = _find_free_port()
 
         # Create overlay qcow2 backed by the velxio rootfs ext4. Each
         # session gets its own writable layer; reads cascade down to
@@ -420,24 +409,17 @@ class QemuManager:
             '-nic',     'none',
             '-display', 'none',
             '-monitor', 'none',
-            # Console: TCP chardev on PL011 UART (/dev/ttyAMA0).
+            # Console: TCP chardev on PL011 UART 0 (/dev/ttyAMA0).
             # The frontend serial WebSocket connects to this port.
             '-serial',  f'tcp:127.0.0.1:{inst.serial_port},server=on,wait=off',
-            # Protocol channel: pipe (FIFO pair) instead of a socket
-            # chardev. virtserialport on socket chardev has a known
-            # guest→host flow bug in QEMU 10 (see decisions.md D9).
-            # Pipe creates <path>.in (host→guest) + <path>.out
-            # (guest→host) as named FIFOs that QEMU opens lazily.
-            # Inside the guest this still appears as /dev/vport<N>p<M>
-            # with the name "velxio-protocol".
-            '-chardev', f'pipe,id=proto,path={inst.proto_pipe_base}',
-            '-device', serial_dev,
-            '-device', 'virtserialport,chardev=proto,name=velxio-protocol',
+            # Protocol / GPIO channel: TCP chardev on PL011 UART 1 (/dev/ttyAMA1).
+            # Streams pin changes from python/gpiozero live to frontend canvas.
+            '-serial',  f'tcp:127.0.0.1:{inst.gpio_port},server=on,wait=off',
             # Kernel cmdline:
             #   console=ttyAMA0,115200 — PL011 UART user terminal.
-            #   rdinit=/bin/sh — boot directly into the RAM-resident shell.
+            #   rdinit=/init — mounts proc/sys/dev/home/pi and runs shell.
             #   panic=10 — auto-reboot 10 s after a panic.
-            '-append', 'console=ttyAMA0,115200 rdinit=/bin/sh panic=10',
+            '-append', 'console=ttyAMA0,115200 rdinit=/init panic=10',
         ]
 
 
@@ -525,89 +507,40 @@ class QemuManager:
         logger.info('%s: _read_serial exited (running=%s, reads=%d, timeouts=%d)',
                     inst.client_id, inst.running, read_count, timeout_count)
 
-    # ── Protocol channel (virtio-serial / /dev/vport0p2) ──────────────────────
-    # Methods keep the historical "_gpio" naming so the rest of the
-    # codebase (simulation route, GPIO event bus) doesn't have to
-    # rename. Phase 2 swaps the line parser for the full multi-protocol
-    # mux while keeping this connect/read/write plumbing identical.
+    # ── Protocol / GPIO channel (PL011 UART 1 / /dev/ttyAMA1) ─────────────────
+    # Connects to QEMU's second serial port on inst.gpio_port.
+    # Receives real-time GPIO updates (e.g. GPIO 17 1) from python/gpiozero
+    # and dispatches to the frontend. Sends inputs (e.g. SET 2 1) to guest.
 
     async def _connect_gpio(self, inst: PiInstance) -> None:
-        """Open the proto pipe pair. QEMU's `pipe` chardev creates
-        two FIFOs: <base>.in (we write → guest reads via /dev/vport<N>)
-        and <base>.out (guest writes → we read).
-
-        We open both ends non-blocking so opening the not-yet-written
-        side doesn't deadlock, then register the read FIFO with the
-        asyncio loop so incoming bytes wake the line parser.
-        """
-        if not inst.proto_pipe_base:
-            return
-        in_path  = inst.proto_pipe_base + '.in'
-        out_path = inst.proto_pipe_base + '.out'
-
-        # Wait for the FIFOs to exist (created by _boot before this
-        # task is spawned). If QEMU failed to start they may never
-        # appear — bail after a few seconds.
-        for _ in range(50):
-            if os.path.exists(in_path) and os.path.exists(out_path):
-                break
-            await asyncio.sleep(0.1)
-        else:
-            logger.warning('%s: proto pipe FIFOs missing; aborting',
-                           inst.client_id)
-            return
-
-        try:
-            # O_RDWR keeps both ends opened on the host side so the
-            # FIFOs never reach an EOF state, even if QEMU briefly
-            # disconnects (e.g. between booting and the guest opening
-            # /dev/vport<N>). Non-blocking so we can integrate with
-            # the asyncio loop via add_reader/add_writer.
-            inst._proto_in_fd  = os.open(in_path,
-                                         os.O_RDWR | os.O_NONBLOCK)
-            inst._proto_out_fd = os.open(out_path,
-                                         os.O_RDWR | os.O_NONBLOCK)
-        except OSError as exc:
-            logger.warning('%s: open proto pipes: %s',
-                           inst.client_id, exc)
-            return
-
-        logger.info('%s: protocol channel opened (pipe %s.{in,out})',
-                    inst.client_id, inst.proto_pipe_base)
-
-        loop = asyncio.get_running_loop()
-        # Use add_reader to integrate the readable FIFO with the loop.
-        linebuf = bytearray()
-
-        def _on_readable() -> None:
-            fd = inst._proto_out_fd
-            if fd is None:
-                return
+        """Connect to QEMU's second PL011 UART on inst.gpio_port."""
+        for attempt in range(10):
             try:
-                data = os.read(fd, 4096)
-            except BlockingIOError:
+                reader, writer = await asyncio.open_connection(
+                    '127.0.0.1', inst.gpio_port,
+                )
+                inst._gpio_writer = writer
+                logger.info('%s: gpio channel connected on port %d',
+                            inst.client_id, inst.gpio_port)
+                await self._read_gpio(inst, reader)
                 return
-            except OSError:
-                return
-            if not data:
-                return
-            linebuf.extend(data)
-            while b'\n' in linebuf:
-                line, _, rest = linebuf.partition(b'\n')
-                linebuf[:] = rest
-                asyncio.create_task(self._handle_gpio_line(
-                    inst, line.decode('ascii', 'ignore').strip(),
-                ))
+            except (ConnectionRefusedError, OSError):
+                await asyncio.sleep(1.0 * (attempt + 1))
+        logger.warning('%s: could not connect to QEMU gpio port', inst.client_id)
 
-        loop.add_reader(inst._proto_out_fd, _on_readable)
-        # Keep this coroutine alive while inst is running so the loop
-        # doesn't garbage-collect the reader registration.
+    async def _read_gpio(self, inst: PiInstance,
+                         reader: asyncio.StreamReader) -> None:
         while inst.running:
-            await asyncio.sleep(1.0)
-        try:
-            loop.remove_reader(inst._proto_out_fd)
-        except Exception:
-            pass
+            try:
+                line_bytes = await reader.readline()
+                if not line_bytes:
+                    break
+                line = line_bytes.decode('ascii', errors='ignore').strip()
+                if line:
+                    asyncio.create_task(self._handle_gpio_line(inst, line))
+            except Exception as e:
+                logger.warning('%s gpio read error: %s', inst.client_id, e)
+                break
 
     async def _handle_gpio_line(self, inst: PiInstance, line: str) -> None:
         """Dispatch a single text-protocol line from the Pi shim layer.
@@ -620,7 +553,6 @@ class QemuManager:
           PWM_CHANGE <bcm> <freq> <duty>    → gpio_pwm event
           PWM_STOP <bcm>                    → gpio_pwm stop
           I2C / SPI / UART …                → reply I2C_ERR / SPI_DATA empty
-                                              (Phase 2.5 wires real bridges)
         """
         parts = line.split()
         if not parts:
@@ -638,9 +570,6 @@ class QemuManager:
             return
 
         if op == 'GPIO_SETUP' and len(parts) >= 3:
-            # Setup is informational; emit so the frontend can show
-            # pin direction badges if it wants. No canvas-level wiring
-            # needed today.
             try:
                 pin = int(parts[1])
                 direction = parts[2]
@@ -654,11 +583,6 @@ class QemuManager:
             return
 
         if op == 'GPIO_IN' and len(parts) == 2:
-            # Reply with the last known state of the pin. For Phase 2
-            # we just echo 0 — the canvas-side input wiring fans in
-            # through SET commands which the shim caches on the guest.
-            # When canvas-driven inputs land in Phase 2.5 this will
-            # query the gpio event bus' last-state map.
             try:
                 pin = int(parts[1])
                 await self._reply_gpio(inst, f'VAL {pin} 0')
@@ -688,10 +612,6 @@ class QemuManager:
                 pass
             return
 
-        # I2C / SPI / UART — if a pro overlay has registered a slave
-        # dispatcher, route the frame to it; otherwise reply with
-        # stubs (Phase 2 behaviour) so user code gets a deterministic
-        # answer instead of hanging.
         if op in ('I2C', 'SPI', 'UART'):
             disp = _PI_PROTOCOL_DISPATCHER
             if disp is not None:
@@ -703,7 +623,6 @@ class QemuManager:
                 if reply is not None:
                     await self._reply_gpio(inst, reply)
                     return
-            # Fall through to default stubs
             if op == 'I2C' and len(parts) >= 4:
                 sub = parts[3]
                 if sub in ('R', 'RR'):
@@ -723,27 +642,27 @@ class QemuManager:
                 await self._reply_gpio(inst, f'UART_RX {parts[1]}')
             return
 
-        # Unknown — log at debug level (not a hot path)
         logger.debug('pi-protocol: unhandled line: %r', line)
 
     async def _reply_gpio(self, inst: PiInstance, line: str) -> None:
-        """Send a reply frame back to the guest over the protocol
-        chardev (pipe-backed). Used for any op that the shim layer
-        waits on."""
-        if inst._proto_in_fd is None:
+        """Send a reply frame back to the guest over the second serial port."""
+        if not inst._gpio_writer:
             return
         try:
-            os.write(inst._proto_in_fd, (line + '\n').encode('ascii'))
+            inst._gpio_writer.write((line + '\n').encode('ascii'))
+            await inst._gpio_writer.drain()
         except OSError as e:
             logger.warning('%s protocol reply: %s', inst.client_id, e)
 
     async def _send_gpio(self, inst: PiInstance, pin: int,
                           state: bool) -> None:
-        if inst._proto_in_fd is None:
+        """Send an input pin change (SET <pin> <0|1>) to the guest."""
+        if not inst._gpio_writer:
             return
-        msg = f'SET {pin} {1 if state else 0}\n'.encode()
+        msg = f'SET {pin} {1 if state else 0}\n'.encode('ascii')
         try:
-            os.write(inst._proto_in_fd, msg)
+            inst._gpio_writer.write(msg)
+            await inst._gpio_writer.drain()
         except OSError as e:
             logger.warning('%s protocol send: %s', inst.client_id, e)
 
@@ -783,23 +702,7 @@ class QemuManager:
                 pass
             inst._gpio_writer = None
 
-        # Close the proto pipe FDs and unlink the FIFOs.
-        for attr in ('_proto_in_fd', '_proto_out_fd'):
-            fd = getattr(inst, attr, None)
-            if fd is not None:
-                try:
-                    os.close(fd)
-                except OSError:
-                    pass
-                setattr(inst, attr, None)
-        if inst.proto_pipe_base:
-            for suffix in ('.in', '.out'):
-                p = inst.proto_pipe_base + suffix
-                try:
-                    os.unlink(p)
-                except OSError:
-                    pass
-            inst.proto_pipe_base = None
+
 
         if inst._serial_writer:
             try:
