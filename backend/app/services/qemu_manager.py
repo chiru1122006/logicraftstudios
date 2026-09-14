@@ -34,6 +34,7 @@ import logging
 import os
 import socket
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 from typing import Callable, Awaitable
