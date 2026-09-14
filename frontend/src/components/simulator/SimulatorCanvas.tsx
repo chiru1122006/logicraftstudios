@@ -22,6 +22,7 @@ import { DynamicComponent, createComponentFromMetadata } from '../DynamicCompone
 import { InstrumentComponent } from '../components-instruments/InstrumentComponent';
 import { ComponentRegistry } from '../../services/ComponentRegistry';
 import { getTabSessionId } from '../../simulation/Esp32Bridge';
+import { getApiBase } from '../../lib/apiBase';
 import { CameraToggle } from './CameraToggle';
 import { ComponentCameraToggles } from './ComponentCameraToggles';
 import { MicrophoneToggle } from './MicrophoneToggle';
@@ -3009,9 +3010,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
                     const hasIp = status === 'got_ip';
                     const sessionId = getTabSessionId();
                     const clientId = `${sessionId}::${activeBoard.id}`;
-                    const backendBase =
-                      (import.meta.env.VITE_API_BASE as string | undefined) ??
-                      'http://localhost:8001/api';
+                    const backendBase = getApiBase();
                     const gatewayUrl = `${backendBase}/gateway/${clientId}/`;
 
                     const togglePanel = (): boolean => {

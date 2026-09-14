@@ -300,6 +300,14 @@ class QemuManager:
         logger.info('[%s] booting %s (cpu=%s mem=%s)',
                     inst.client_id, inst.board_type, cfg['cpu'], cfg['memory'])
 
+        # Ensure platform supports FIFO pipes and Linux QEMU
+        if sys.platform == 'win32' or not hasattr(os, 'mkfifo'):
+            await inst.emit('error', {
+                'message': 'Raspberry Pi Linux emulation requires a Linux server with QEMU. Please point your backend to Azure (http://104.214.172.50).'
+            })
+            self._instances.pop(inst.client_id, None)
+            return
+
         # Resolve boot files via the provider (downloads + verifies on
         # first call; cache hit on subsequent calls thanks to the
         # lifespan pre-warm at module load).

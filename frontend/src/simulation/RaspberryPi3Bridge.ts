@@ -28,21 +28,7 @@
  */
 
 import { getTabSessionId } from './Esp32Bridge';
-
-const API_BASE = (): string => {
-  // The desktop shell injects the sidecar URL at runtime (random port) via
-  // window.__VELXIO_API_BASE__; honor it first so the QEMU-board WebSocket
-  // reaches the local Python sidecar instead of the build-time / dev
-  // default. Without this, ESP32 / Pi / STM32 simulations never start in
-  // the desktop app (the WS dialed localhost:8001, not the sidecar port).
-  if (typeof window !== 'undefined') {
-    const injected = (window as { __VELXIO_API_BASE__?: string }).__VELXIO_API_BASE__;
-    if (typeof injected === 'string' && injected) {
-      return injected.replace(/\/+$/, '');
-    }
-  }
-  return (import.meta.env.VITE_API_BASE as string | undefined) ?? 'http://localhost:8001/api';
-};
+import { getSimWebSocketUrl } from '../lib/apiBase';
 
 export class RaspberryPi3Bridge {
   readonly boardId: string;
@@ -121,15 +107,8 @@ export class RaspberryPi3Bridge {
     // showing Stop. Drop it and open a fresh one.
     this.socket = null;
 
-    const base = API_BASE();
-    const wsProtocol = base.startsWith('https') ? 'wss:' : 'ws:';
-    // Scope the backend client_id to THIS tab. With the bare boardId, two
-    // tabs (or two users) opening the same example shared one QEMU
-    // instance: serial output went to whichever WebSocket connected last,
-    // keystrokes interleaved, and one tab's stop killed the other's guest.
     const clientId = `${this.boardId}--${getTabSessionId()}`;
-    const wsUrl =
-      base.replace(/^https?:/, wsProtocol) + `/simulation/ws/${encodeURIComponent(clientId)}`;
+    const wsUrl = getSimWebSocketUrl(clientId);
 
     const socket = new WebSocket(wsUrl);
     this.socket = socket;

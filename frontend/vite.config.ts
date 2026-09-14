@@ -46,8 +46,9 @@ export default defineConfig(({ command }) => ({
   server: {
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8001',
+        target: process.env.VITE_BACKEND_TARGET || 'http://104.214.172.50',
         changeOrigin: true,
+        ws: true,
       },
     },
   },

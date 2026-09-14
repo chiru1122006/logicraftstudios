@@ -102,21 +102,7 @@ export {
   isSingleWireSensorRecord,
   sensorRecordOwnsPin,
 } from './sensorModels';
-
-const API_BASE = (): string => {
-  // The desktop shell injects the sidecar URL at runtime (random port) via
-  // window.__VELXIO_API_BASE__; honor it first so the QEMU-board WebSocket
-  // reaches the local Python sidecar instead of the build-time / dev
-  // default. Without this, ESP32 / Pi / STM32 simulations never start in
-  // the desktop app (the WS dialed localhost:8001, not the sidecar port).
-  if (typeof window !== 'undefined') {
-    const injected = (window as { __VELXIO_API_BASE__?: string }).__VELXIO_API_BASE__;
-    if (typeof injected === 'string' && injected) {
-      return injected.replace(/\/+$/, '');
-    }
-  }
-  return (import.meta.env.VITE_API_BASE as string | undefined) ?? 'http://localhost:8001/api';
-};
+import { getSimWebSocketUrl } from '../lib/apiBase';
 
 /** Returns a stable UUID for this browser tab (persists across reloads, resets on new tab). */
 export function getTabSessionId(): string {
@@ -397,12 +383,8 @@ export class Esp32Bridge {
       this._connected = false;
     }
 
-    const base = API_BASE();
-    const wsProtocol = base.startsWith('https') ? 'wss:' : 'ws:';
     const sessionId = getTabSessionId();
-    const wsUrl =
-      base.replace(/^https?:/, wsProtocol) +
-      `/simulation/ws/${encodeURIComponent(sessionId + '::' + this.boardId)}`;
+    const wsUrl = getSimWebSocketUrl(sessionId + '::' + this.boardId);
 
     const socket = new WebSocket(wsUrl);
     this.socket = socket;

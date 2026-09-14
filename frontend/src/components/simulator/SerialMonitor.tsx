@@ -7,6 +7,7 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSimulatorStore } from '../../store/useSimulatorStore';
 import { getTabSessionId } from '../../simulation/Esp32Bridge';
+import { getApiBase } from '../../lib/apiBase';
 import { openDeviceGateway } from '../../lib/openDeviceGateway';
 import type { BoardKind } from '../../types/board';
 import { boardDisplayName, isPiBoardKind } from '../../types/board';
@@ -312,9 +313,7 @@ export const SerialMonitor: React.FC = () => {
                 const parts: (string | React.ReactNode)[] = [];
                 let lastIdx = 0;
                 const sessionId = getTabSessionId();
-                const backendBase =
-                  (import.meta.env.VITE_API_BASE as string | undefined) ??
-                  'http://localhost:8001/api';
+                const backendBase = getApiBase();
 
                 matches.forEach((m, i) => {
                   const start = m.index!;
