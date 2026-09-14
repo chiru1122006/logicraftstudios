@@ -1,0 +1,15 @@
+# Production Dockerfile for Logicraft Studio Backend
+# Based on the multi-toolchain QEMU + ESP-IDF image
+FROM ghcr.io/davidmonterocrespo24/velxio:master
+
+# Replace existing backend app code and SDK with fresh Logicraft Studio monorepo
+COPY backend/app /app/app
+COPY backend/sdk /app/sdk
+COPY backend/requirements.txt /app/requirements.txt
+
+# Ensure dependencies are satisfied
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+EXPOSE 80
+
+CMD ["/app/entrypoint.sh"]
