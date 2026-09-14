@@ -1,4 +1,4 @@
-# Velxio: Arduino & Embedded Board Emulator
+# logicraftstudios: Arduino & Embedded Board Emulator
 
 **Live at [logicraftstudios.tech](https://logicraftstudios.tech)**
 
