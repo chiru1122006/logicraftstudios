@@ -132,10 +132,10 @@ export class RaspberryPi3Bridge {
           type: 'start_pi',
           data: { board: this.boardKind, ...this.startPayload },
         });
+        const label = this.quietBootLabel || this.boardKind;
+        this._emitLocal(`[Logicraft Studios] Booting ${label} (Linux guest)... Please wait ~25s for Linux OS to initialize.\r\n`);
         if (this.quietBootDefault) {
           this._quiet = true;
-          const label = this.quietBootLabel || this.boardKind;
-          this._emitLocal(`[Velxio] Booting ${label} (Linux guest)`);
           this._quietTimer = setInterval(() => this._emitLocal('.', false), 4000);
         }
       };
@@ -322,8 +322,9 @@ export class RaspberryPi3Bridge {
   private _observeSerial(text: string): void {
     this._serialTail = (this._serialTail + text).slice(-512);
     const clean = RaspberryPi3Bridge._stripAnsi(this._serialTail);
-    if (!this._booted && (/login on 'hvc0'/.test(clean) || /:~[#$]/.test(clean))) {
+    if (!this._booted && (/login on 'hvc0'/.test(clean) || /:~[#$]/.test(clean) || /root@raspberrypi/.test(clean))) {
       this._booted = true;
+      this._emitLocal('\r\n[Logicraft Studios] Linux guest booted successfully! Ready for input.\r\n');
       this.onBooted?.();
     }
     // A shell prompt ends in "# " / "$ " (trailing space, no newline). Trim

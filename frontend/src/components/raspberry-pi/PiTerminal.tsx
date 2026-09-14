@@ -73,6 +73,14 @@ export const PiTerminal: React.FC<PiTerminalProps> = ({ boardId }) => {
       }
     });
 
+    const handleClick = () => {
+      try {
+        term.focus();
+      } catch (_) {}
+    };
+    const containerNode = containerRef.current;
+    containerNode?.addEventListener('click', handleClick);
+
     // Intercept bridge serial output → terminal display
     const bridge = getBoardBridge(boardId);
     if (bridge) {
@@ -85,6 +93,7 @@ export const PiTerminal: React.FC<PiTerminalProps> = ({ boardId }) => {
     }
 
     return () => {
+      containerNode?.removeEventListener('click', handleClick);
       onDataDispose.dispose();
       // Restore original bridge callback
       const bridgeOnCleanup = getBoardBridge(boardId);

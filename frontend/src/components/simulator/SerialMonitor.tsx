@@ -370,12 +370,7 @@ export const SerialMonitor: React.FC = () => {
       </pre>
       )}
 
-      {/* Input row — the xterm handles Pi input itself */}
-      {!(
-        isPiBoardKind(activeBoard?.boardKind ?? '') &&
-        activeBoard?.running &&
-        activeBoard?.engineMode !== 'instant'
-      ) && (
+      {/* Input row — accessible across all boards including Raspberry Pi */}
       <div style={styles.inputRow}>
         <input
           type="text"
@@ -383,9 +378,13 @@ export const SerialMonitor: React.FC = () => {
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={
-            isMicroPython
-              ? t('editor.serial.placeholderPython')
-              : t('editor.serial.placeholderText')
+            isPiBoardKind(activeBoard?.boardKind ?? '')
+              ? (activeBoard?.piBooted
+                  ? "Type command (e.g. ls, uname -a) and press Enter..."
+                  : "Booting Linux OS (~25s)... ready once prompt appears")
+              : isMicroPython
+                ? t('editor.serial.placeholderPython')
+                : t('editor.serial.placeholderText')
           }
           style={styles.input}
           disabled={!activeBoard?.running}
@@ -404,7 +403,6 @@ export const SerialMonitor: React.FC = () => {
           {t('editor.serial.send')}
         </button>
       </div>
-      )}
     </div>
   );
 };
