@@ -16,6 +16,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+*.dll
+backend/app/services/qemu_lib/
 .Python
 venv/
 env/

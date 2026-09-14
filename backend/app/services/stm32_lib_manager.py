@@ -43,7 +43,11 @@ elif sys.platform == 'darwin':
 else:
     _LIB_EXT = '.so'
 
-_LIB_ARM_NAME = f'libqemu-arm{_LIB_EXT}'
+_LIB_NAMES = [
+    f'libqemu-arm{_LIB_EXT}',
+    f'libqemu-stm32{_LIB_EXT}',
+]
+_LIB_ARM_NAME = _LIB_NAMES[0]
 _DEFAULT_LIB_ARM = str(_SERVICES_DIR / _LIB_ARM_NAME)
 
 _WORKER_SCRIPT = _SERVICES_DIR / 'stm32_worker.py'
@@ -72,25 +76,50 @@ _MACHINE: dict[str, str] = {
 }
 
 
-def _resolve_lib(env_var: str, lib_name: str, default_path: str) -> str:
-    """Same three-step resolution as the ESP32 manager: env var, then
-    VELXIO_QEMU_PATH directory, then beside this module."""
-    direct = os.environ.get(env_var, '')
+def _resolve_lib(env_var: str, lib_names: list[str], default_path: str) -> str:
+    """Multi-step resolution for libqemu-arm/stm32 shared library:
+    1. Explicit env var (e.g. QEMU_STM32_LIB)
+    2. qemu_lib subfolder in services (for bundled Windows/dev libraries)
+    3. Docker standard /app/lib directory
+    4. VELXIO_QEMU_PATH directory
+    5. Beside this module
+    6. System PICSimLab paths (/usr/lib/picsimlab/qemu, /opt/picsimlab)
+    7. default_path fallback
+    """
+    direct = os.environ.get(env_var, '').strip()
     if direct and os.path.isfile(direct):
         return direct
-    qemu_dir = os.environ.get('VELXIO_QEMU_PATH', '')
+
+    search_dirs = [
+        _SERVICES_DIR / 'qemu_lib',
+        _SERVICES_DIR,
+        pathlib.Path('/app/lib'),
+        _SERVICES_DIR.parent.parent / 'lib',
+    ]
+
+    qemu_dir = os.environ.get('VELXIO_QEMU_PATH', '').strip()
     if qemu_dir:
-        candidate = os.path.join(qemu_dir, lib_name)
-        if os.path.isfile(candidate):
-            return candidate
+        search_dirs.append(pathlib.Path(qemu_dir))
+
+    search_dirs.extend([
+        pathlib.Path('/usr/lib/picsimlab/qemu'),
+        pathlib.Path('/opt/picsimlab'),
+    ])
+
+    for d in search_dirs:
+        for name in lib_names:
+            candidate = d / name
+            if candidate.is_file():
+                return str(candidate)
+
     if os.path.isfile(default_path):
         return default_path
     return ''
 
 
 def lib_arm_path() -> str:
-    """Current resolved path to libqemu-arm.<ext>, or '' if missing."""
-    return _resolve_lib('QEMU_STM32_LIB', _LIB_ARM_NAME, _DEFAULT_LIB_ARM)
+    """Current resolved path to libqemu-arm/stm32.<ext>, or '' if missing."""
+    return _resolve_lib('QEMU_STM32_LIB', _LIB_NAMES, _DEFAULT_LIB_ARM)
 
 
 class _UartBuffer:

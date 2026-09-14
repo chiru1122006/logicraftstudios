@@ -118,9 +118,19 @@ def main() -> None:
     machine         = cfg.get('machine', 'stm32vldiscovery')
     initial_sensors = cfg.get('sensors', [])
 
-    _MINGW64_BIN = r'C:\msys64\mingw64\bin'
-    if os.name == 'nt' and os.path.isdir(_MINGW64_BIN):
-        os.add_dll_directory(_MINGW64_BIN)
+    if os.name == 'nt':
+        lib_dir = os.path.dirname(os.path.abspath(lib_path))
+        if os.path.isdir(lib_dir):
+            try:
+                os.add_dll_directory(lib_dir)
+            except Exception:
+                pass
+        _MINGW64_BIN = r'C:\msys64\mingw64\bin'
+        if os.path.isdir(_MINGW64_BIN):
+            try:
+                os.add_dll_directory(_MINGW64_BIN)
+            except Exception:
+                pass
     try:
         lib = ctypes.CDLL(lib_path)
     except Exception as exc:
