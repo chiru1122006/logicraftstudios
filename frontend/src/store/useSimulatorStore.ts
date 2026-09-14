@@ -1066,7 +1066,11 @@ export async function piSyncAndRunScript(boardId: string, boardKind: string): Pr
     // the user's first visible output is their own program.
     bridge.setQuiet(false);
   }
-  const cmd = proDef?.autoRun ?? `python3 ${home}/script.py`;
+  const mainFile = files.find((f) => f.path.endsWith('/main.py'))
+                || files.find((f) => f.path.endsWith('/script.py'))
+                || files[0];
+  const targetScript = mainFile ? mainFile.path : `${home}/main.py`;
+  const cmd = proDef?.autoRun ?? `ln -sf ${targetScript} ${home}/script.py 2>/dev/null; python3 ${targetScript}`;
   bridge.sendSerialText(cmd.endsWith('\n') ? cmd : cmd + '\n');
 }
 

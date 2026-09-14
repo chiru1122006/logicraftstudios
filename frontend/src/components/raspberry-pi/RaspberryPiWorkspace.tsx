@@ -292,9 +292,9 @@ export const RaspberryPiWorkspace: React.FC<RaspberryPiWorkspaceProps> = ({ boar
           )}
 
           {/* Booting overlay — shown while the guest Linux comes up (~30-60s).
-              Without it the user clicks Start and sees nothing change for a
-              minute and assumes it is broken. */}
-          {booting && (
+              We only show this on editor tabs so the user can see the terminal
+              boot logs when on the terminal tab. */}
+          {booting && activePane !== 'terminal' && (
             <div style={styles.offlineOverlay}>
               <div style={styles.offlineBox}>
                 <div style={styles.bootingIcon}><BootSpinner /></div>
