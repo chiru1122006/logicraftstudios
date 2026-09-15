@@ -1,4 +1,4 @@
-# Velxio Desktop App
+# logicraftstudios Desktop App
 
 Native desktop build of the Velxio simulator — same React frontend, wrapped in a Tauri shell, with the QEMU binaries bundled in. Targets Windows, macOS, and Linux.
 
