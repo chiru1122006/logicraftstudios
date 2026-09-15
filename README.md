@@ -14,9 +14,8 @@ An open-source multi-board emulator and circuit simulator. Write Arduino C++, Mi
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-logicraftstudios.tech-007acc?style=for-the-badge)](https://logicraftstudios.tech)
 [![Docker Image](https://img.shields.io/badge/Docker-ghcr.io%2Fchiru1122006%2Flogicraftstudios-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://github.com/chiru1122006/logicraftstudios/pkgs/container/logicraftstudios)
 [![GitHub stars](https://img.shields.io/github/stars/chiru1122006/logicraftstudios?style=for-the-badge)](https://github.com/chiru1122006/logicraftstudios/stargazers)
-[![Discord](https://img.shields.io/badge/Discord-Join%20Community-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/3mARjJrh4E)
 [![License: AGPLv3](https://img.shields.io/badge/License-AGPL%20v3-blue?style=for-the-badge)](LICENSE)
-[![Commercial License](https://img.shields.io/badge/Commercial%20License-Available-green?style=for-the-badge)](COMMERCIAL_LICENSE.md)
+
 
 ---
 
@@ -53,7 +52,7 @@ instead of 5-30 seconds.
 
 <table>
 <tr>
-  <td align="center"><img src="docs/img/boards/aries-v3.png" width="120" alt="ARIES v3.0"/><br/><b>ARIES v3.0</b></td>
+  <td align="center"><img src="/cdac_aries_v3_board_only.svg" width="120" alt="ARIES v3.0"/><br/><b>ARIES v3.0</b></td>
   <td align="center"><img src="docs/img/boards/arduino-uno.png" width="120" alt="Arduino Uno"/><br/><b>Arduino Uno</b></td>
   <td align="center"><img src="docs/img/boards/arduino-nano.png" width="120" alt="Arduino Nano"/><br/><b>Arduino Nano</b></td>
   <td align="center"><img src="docs/img/boards/arduino-mega.png" width="120" alt="Arduino Mega 2560"/><br/><b>Arduino Mega 2560</b></td>
