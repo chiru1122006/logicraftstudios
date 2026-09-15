@@ -342,28 +342,9 @@ Lead Author & Maintainer: **Chirudeep Reddy** ([@chiru1122006](https://github.co
 
 ## License
 
-Logicraft Studios uses a **dual-licensing** model:
-
-| Use case | License | Cost |
-| --- | --- | --- |
 | Personal, educational, open-source (AGPLv3 compliant) | [AGPLv3](LICENSE) | Free |
-| Proprietary / closed-source product or SaaS | [Commercial License](COMMERCIAL_LICENSE.md) | Paid |
 
-The AGPLv3 is a certified Open Source license. It is free for all uses — including commercial — as long as any modifications or network-accessible deployments make their source code available under the same license. Companies that cannot comply with that requirement can purchase a Commercial License.
 
-For commercial licensing inquiries: [chiru1122006@gmail.com](mailto:chiru1122006@gmail.com)
-
-See [LICENSE](LICENSE) and [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md) for full terms.
-
-## Star History
-
-<a href="https://www.star-history.com/?type=date&repos=chiru1122006%2Flogicraftstudios">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=chiru1122006/logicraftstudios&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=chiru1122006/logicraftstudios&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=chiru1122006/logicraftstudios&type=date&legend=top-left" />
- </picture>
-</a>
 
 ## References
 
